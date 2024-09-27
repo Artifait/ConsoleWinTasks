@@ -11,7 +11,7 @@ namespace QuizTop
         public static Stack<IWin> WinStack = new();
         public static bool IsRunning = false;
         public static string PathData = Directory.GetCurrentDirectory();
-        public static PointDB dB = new("Fruits");
+        public static PointDB dB = new("Storage");
         public static bool CursorVisible { get; set; } = false;
 
         private static void Init()

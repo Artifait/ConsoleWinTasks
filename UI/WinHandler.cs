@@ -23,7 +23,7 @@ namespace QuizTop.UI
                 stringList1.AddRange(message.Split('\n'));
 
             IWin window;
-            if (isFatal)
+            if (true)
             {
                 window = GetWindow<WinErrore>();
                 ((WinErrore)window).UpdateErroreMsg(stringList1.ToArray());
