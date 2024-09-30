@@ -65,7 +65,8 @@ public class PointDB
 		{
 			if (OpenDB())
 			{
-				using SqlDataAdapter adapter = new(cmd);
+                cmd.Connection = conn;
+                using SqlDataAdapter adapter = new(cmd);
 				adapter.Fill(dt);
 			}
 		}

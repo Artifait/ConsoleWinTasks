@@ -4,117 +4,206 @@ using QuizTop.UI;
 
 namespace ConsoleWinApp.UI.Win.ApplicationWin
 {
-	public class Task4 : IWin
-	{
-		public WindowDisplay windowDisplay = new("Task 4: Advanced Display Operations", typeof(ProgramOptions));
+    public class Task4 : IWin
+    {
+        public WindowDisplay windowDisplay = new("Task 4: Advanced SQL Queries", typeof(ProgramOptions));
 
-		public WindowDisplay WindowDisplay
-		{
-			get => windowDisplay;
-			set => windowDisplay = value;
-		}
+        public WindowDisplay WindowDisplay
+        {
+            get => windowDisplay;
+            set => windowDisplay = value;
+        }
 
-		public Type? ProgramOptionsType => typeof(ProgramOptions);
-		public Type? ProgramFieldsType => null;
+        public Type? ProgramOptionsType => typeof(ProgramOptions);
+        public Type? ProgramFieldsType => null;
 
-		public int SizeX => windowDisplay.MaxLeft;
-		public int SizeY => windowDisplay.MaxTop;
+        public int SizeX => windowDisplay.MaxLeft;
+        public int SizeY => windowDisplay.MaxTop;
 
-		public void Show() => windowDisplay.Show();
+        public void Show() => windowDisplay.Show();
 
-		public void InputHandler()
-		{
-			char lower = char.ToLower(Console.ReadKey().KeyChar);
-			WindowTools.UpdateCursorPos(lower, ref windowDisplay, (int)ProgramOptions.CountOptions);
+        public void InputHandler()
+        {
+            char lower = char.ToLower(Console.ReadKey().KeyChar);
+            WindowTools.UpdateCursorPos(lower, ref windowDisplay, (int)ProgramOptions.CountOptions);
 
-			if (WindowTools.IsKeySelect(lower)) HandleMenuOption();
-		}
+            if (WindowTools.IsKeySelect(lower)) HandleMenuOption();
+        }
 
-		private void HandleMenuOption()
-		{
-			Console.Clear();
-			PointDB db = Application.dB;
-			Console.CursorTop = SizeY;
+        private void HandleMenuOption()
+        {
+            Console.Clear();
+            PointDB db = Application.dB;
+            Console.CursorTop = SizeY;
 
-			switch ((ProgramOptions)windowDisplay.CursorPosition)
-			{
-				case ProgramOptions.DisplayProductsByType:
-					DisplayProductsByType(db);
-					break;
+            switch ((ProgramOptions)windowDisplay.CursorPosition)
+            {
+                case ProgramOptions.TopManagerByUnitsSold:
+                    ShowTopManagerByUnitsSold(db);
+                    break;
 
-				case ProgramOptions.DisplayProductsByManager:
-					DisplayProductsByManager(db);
-					break;
+                case ProgramOptions.TopManagerByProfit:
+                    ShowTopManagerByProfit(db);
+                    break;
 
-				case ProgramOptions.DisplayProductsByFirm:
-					DisplayProductsByFirm(db);
-					break;
+                case ProgramOptions.TopManagerByProfitInRange:
+                    ShowTopManagerByProfitInRange(db);
+                    break;
 
-				case ProgramOptions.DisplayRecentSale:
-					DisplayRecentSale(db);
-					break;
+                case ProgramOptions.TopCustomerByAmountSpent:
+                    ShowTopCustomerByAmountSpent(db);
+                    break;
 
-				case ProgramOptions.DisplayAverageQuantityByType:
-					DisplayAverageQuantityByType(db);
-					break;
+                case ProgramOptions.TopProductTypeByUnitsSold:
+                    ShowTopProductTypeByUnitsSold(db);
+                    break;
 
-				case ProgramOptions.Back:
-					Application.WinStack.Pop();
-					break;
-			}
-		}
+                case ProgramOptions.TopProductTypeByProfit:
+                    ShowTopProductTypeByProfit(db);
+                    break;
 
-		private void DisplayProductsByType(PointDB db)
-		{
-			Console.Write("Введите ID типа товара: ");
-			int typeId = int.Parse(Console.ReadLine());
-			string query = "SELECT * FROM Products WHERE ProductTypeId = @TypeId";
-			SqlCommand cmd = new(query);
-			cmd.Parameters.AddWithValue("@TypeId", typeId);
-			TV.DisplayTable(db.ExecuteQuery(cmd));
-		}
+                case ProgramOptions.MostPopularProduct:
+                    ShowMostPopularProduct(db);
+                    break;
 
-		private void DisplayProductsByManager(PointDB db)
-		{
-			Console.Write("Введите ID менеджера: ");
-			int managerId = int.Parse(Console.ReadLine());
-			string query = "SELECT * FROM Products p INNER JOIN Sales s ON p.Id = s.ProductId WHERE s.ManagerId = @ManagerId";
-			SqlCommand cmd = new(query);
-			cmd.Parameters.AddWithValue("@ManagerId", managerId);
-			TV.DisplayTable(db.ExecuteQuery(cmd));
-		}
+                case ProgramOptions.ProductsNotSoldInDays:
+                    ShowProductsNotSoldInDays(db);
+                    break;
 
-		private void DisplayProductsByFirm(PointDB db)
-		{
-			Console.Write("Введите ID фирмы: ");
-			int firmId = int.Parse(Console.ReadLine());
-			string query = "SELECT * FROM Products p INNER JOIN Sales s ON p.Id = s.ProductId WHERE s.FirmId = @FirmId";
-			SqlCommand cmd = new(query);
-			cmd.Parameters.AddWithValue("@FirmId", firmId);
-			TV.DisplayTable(db.ExecuteQuery(cmd));
-		}
+                case ProgramOptions.Back:
+                    Application.WinStack.Pop();
+                    break;
+            }
+        }
 
-		private void DisplayRecentSale(PointDB db)
-		{
-			string query = "SELECT TOP 1 * FROM Sales ORDER BY SaleDate DESC";
-			TV.DisplayTable(db.ExecuteQuery(query));
-		}
+        private void ShowTopManagerByUnitsSold(PointDB db)
+        {
+            string query = @"
+                select top 1 m.[ManagerName] 
+                from [Managers] m
+                join [Sales] s on m.[Id] = s.[ManagerId]
+                group by m.[ManagerName]
+                order by sum(s.[QuantitySold]) desc";
 
-		private void DisplayAverageQuantityByType(PointDB db)
-		{
-			string query = "SELECT pt.TypeName, AVG(p.Quantity) AS AverageQuantity FROM Products p INNER JOIN ProductType pt ON p.ProductTypeId = pt.Id GROUP BY pt.TypeName";
-			TV.DisplayTable(db.ExecuteQuery(query));
-		}
+            TV.DisplayTable(db.ExecuteQuery(query));
+        }
 
-		public enum ProgramOptions
-		{
-			DisplayProductsByType,
-			DisplayProductsByManager,
-			DisplayProductsByFirm,
-			DisplayRecentSale,
-			DisplayAverageQuantityByType,
-			Back,
-			CountOptions
-		}
-	}
+        private void ShowTopManagerByProfit(PointDB db)
+        {
+            string query = @"
+                select top 1 m.[ManagerName]
+                from [Managers] m
+                join [Sales] s on m.[Id] = s.[ManagerId]
+                join [Products] p on s.[ProductId] = p.[Id]
+                group by m.[ManagerName]
+                order by sum((p.[UnitPrice] - p.[CostPrice]) * s.[QuantitySold]) desc";
+
+            TV.DisplayTable(db.ExecuteQuery(query));
+        }
+
+        private void ShowTopManagerByProfitInRange(PointDB db)
+        {
+            Console.Write("Введите начальную дату (yyyy-mm-dd): ");
+            string startDate = Console.ReadLine();
+            Console.Write("Введите конечную дату (yyyy-mm-dd): ");
+            string endDate = Console.ReadLine();
+
+            string query = @"
+                select top 1 m.ManagerName
+                from Managers m
+                join Sales s on m.Id = s.ManagerId
+                join Products p on s.ProductId = p.Id
+                where s.SaleDate between @StartDate and @EndDate
+                group by m.ManagerName
+                order by sum((p.UnitPrice - p.CostPrice) * s.QuantitySold) desc";
+
+            SqlCommand cmd = new(query);
+            cmd.Parameters.AddWithValue("@StartDate", startDate);
+            cmd.Parameters.AddWithValue("@EndDate", endDate);
+
+            TV.DisplayTable(db.ExecuteQuery(cmd));
+        }
+
+        private void ShowTopCustomerByAmountSpent(PointDB db)
+        {
+            string query = @"
+                select top 1 f.[FirmName]
+                from [Firms] f
+                join [Sales] s on f.[Id] = s.[FirmId]
+                join [Products] p on s.[ProductId] = p.[Id]
+                group by f.[FirmName]
+                order by sum(p.[UnitPrice] * s.[QuantitySold]) desc";
+
+            TV.DisplayTable(db.ExecuteQuery(query));
+        }
+
+        private void ShowTopProductTypeByUnitsSold(PointDB db)
+        {
+            string query = @"
+                select top 1 pt.[TypeName]
+                from [ProductType] pt
+                join [Products] p on pt.[Id] = p.[ProductTypeId]
+                join [Sales] s on p.[Id] = s.[ProductId]
+                group by pt.[TypeName]
+                order by sum(s.[QuantitySold]) desc";
+
+            TV.DisplayTable(db.ExecuteQuery(query));
+        }
+
+        private void ShowTopProductTypeByProfit(PointDB db)
+        {
+            string query = @"
+                select top 1 pt.TypeName
+                from ProductType pt
+                join Products p on pt.Id = p.ProductTypeId
+                join Sales s on p.Id = s.ProductId
+                group by pt.TypeName
+                order by sum((p.UnitPrice - p.CostPrice) * s.QuantitySold) desc";
+
+            TV.DisplayTable(db.ExecuteQuery(query));
+        }
+
+        private void ShowMostPopularProduct(PointDB db)
+        {
+            string query = @"
+                select top 1 p.ProductName
+                from Products p
+                join Sales s on p.Id = s.ProductId
+                group by p.ProductName
+                order by sum(s.QuantitySold) desc";
+
+            TV.DisplayTable(db.ExecuteQuery(query));
+        }
+
+        private void ShowProductsNotSoldInDays(PointDB db)
+        {
+            Console.Write("Введите количество дней: ");
+            int days = int.Parse(Console.ReadLine());
+
+            string query = @"
+                select p.ProductName
+                from Products p
+                left join Sales s on p.Id = s.ProductId and s.SaleDate > getdate() - @Days 
+                where s.Id is null;";
+
+            SqlCommand cmd = new(query);
+            cmd.Parameters.AddWithValue("@Days", days);
+
+            TV.DisplayTable(db.ExecuteQuery(cmd));
+        }
+
+        public enum ProgramOptions
+        {
+            TopManagerByUnitsSold,
+            TopManagerByProfit,
+            TopManagerByProfitInRange,
+            TopCustomerByAmountSpent,
+            TopProductTypeByUnitsSold,
+            TopProductTypeByProfit,
+            MostPopularProduct,
+            ProductsNotSoldInDays,
+            Back,
+            CountOptions
+        }
+    }
 }

@@ -4,124 +4,145 @@ using QuizTop.UI;
 
 namespace ConsoleWinApp.UI.Win.ApplicationWin
 {
-	public class Task3 : IWin
-	{
-		public WindowDisplay windowDisplay = new("Task 3: Display Operations", typeof(ProgramOptions));
+    public class Task3 : IWin
+    {
+        public WindowDisplay windowDisplay = new("Task 3: Delete Operations", typeof(ProgramOptions));
 
-		public WindowDisplay WindowDisplay
-		{
-			get => windowDisplay;
-			set => windowDisplay = value;
-		}
+        public WindowDisplay WindowDisplay
+        {
+            get => windowDisplay;
+            set => windowDisplay = value;
+        }
 
-		public Type? ProgramOptionsType => typeof(ProgramOptions);
-		public Type? ProgramFieldsType => null;
+        public Type? ProgramOptionsType => typeof(ProgramOptions);
+        public Type? ProgramFieldsType => null;
 
-		public int SizeX => windowDisplay.MaxLeft;
-		public int SizeY => windowDisplay.MaxTop;
+        public int SizeX => windowDisplay.MaxLeft;
+        public int SizeY => windowDisplay.MaxTop;
 
-		public void Show() => windowDisplay.Show();
+        public void Show() => windowDisplay.Show();
 
-		public void InputHandler()
-		{
-			char lower = char.ToLower(Console.ReadKey().KeyChar);
-			WindowTools.UpdateCursorPos(lower, ref windowDisplay, (int)ProgramOptions.CountOptions);
+        public void InputHandler()
+        {
+            char lower = char.ToLower(Console.ReadKey().KeyChar);
+            WindowTools.UpdateCursorPos(lower, ref windowDisplay, (int)ProgramOptions.CountOptions);
 
-			if (WindowTools.IsKeySelect(lower)) HandleMenuOption();
-		}
+            if (WindowTools.IsKeySelect(lower)) HandleMenuOption();
+        }
 
-		private void HandleMenuOption()
-		{
-			Console.Clear();
-			PointDB db = Application.dB;
-			Console.CursorTop = SizeY;
+        private void HandleMenuOption()
+        {
+            Console.Clear();
+            PointDB db = Application.dB;
 
-			switch ((ProgramOptions)windowDisplay.CursorPosition)
-			{
-				case ProgramOptions.DisplayAllProducts:
-					DisplayAllProducts(db);
-					break;
+            switch ((ProgramOptions)windowDisplay.CursorPosition)
+            {
+                case ProgramOptions.DeleteProduct:
+                    DeleteProduct(db);
+                    break;
 
-				case ProgramOptions.DisplayAllProductTypes:
-					DisplayAllProductTypes(db);
-					break;
+                case ProgramOptions.DeleteManager:
+                    DeleteManager(db);
+                    break;
 
-				case ProgramOptions.DisplayAllManagers:
-					DisplayAllManagers(db);
-					break;
+                case ProgramOptions.DeleteProductType:
+                    DeleteProductType(db);
+                    break;
 
-				case ProgramOptions.DisplayMaxQuantityProducts:
-					DisplayMaxQuantityProducts(db);
-					break;
+                case ProgramOptions.DeleteFirm:
+                    DeleteFirm(db);
+                    break;
 
-				case ProgramOptions.DisplayMinQuantityProducts:
-					DisplayMinQuantityProducts(db);
-					break;
+                case ProgramOptions.Back:
+                    Application.WinStack.Pop();
+                    break;
+            }
+        }
 
-				case ProgramOptions.DisplayMinCostPriceProducts:
-					DisplayMinCostPriceProducts(db);
-					break;
+        private void DeleteProduct(PointDB db)
+        {
+            TV.DisplayTable(db.ExecuteQuery("SELECT * FROM Products"));
+            Console.Write("Введите ID товара для удаления: ");
+            int productId = int.Parse(Console.ReadLine());
 
-				case ProgramOptions.DisplayMaxCostPriceProducts:
-					DisplayMaxCostPriceProducts(db);
-					break;
+            string archiveQuery = "INSERT INTO ArchivedProducts SELECT * FROM Products WHERE Id = @ProductId";
+            string deleteQuery = "DELETE FROM Products WHERE Id = @ProductId";
+            SqlCommand cmdArchive = new(archiveQuery);
+            SqlCommand cmdDelete = new(deleteQuery);
 
-				case ProgramOptions.Back:
-					Application.WinStack.Pop();
-					break;
-			}
-		}
+            cmdArchive.Parameters.AddWithValue("@ProductId", productId);
+            cmdDelete.Parameters.AddWithValue("@ProductId", productId);
 
-		private void DisplayAllProducts(PointDB db)
-		{
-			TV.DisplayTable(db.ExecuteQuery("SELECT * FROM Products"));
-		}
+            db.ExecuteNonQuery(cmdArchive);
+            db.ExecuteNonQuery(cmdDelete);
+            WindowsHandler.AddInfoWindow(["Товар успешно удален и архивирован!"]);
+        }
 
-		private void DisplayAllProductTypes(PointDB db)
-		{
-			TV.DisplayTable(db.ExecuteQuery("SELECT * FROM ProductType"));
-		}
+        private void DeleteManager(PointDB db)
+        {
+            TV.DisplayTable(db.ExecuteQuery("SELECT * FROM Managers"));
+            Console.Write("Введите ID менеджера для удаления: ");
+            int managerId = int.Parse(Console.ReadLine());
 
-		private void DisplayAllManagers(PointDB db)
-		{
-			TV.DisplayTable(db.ExecuteQuery("SELECT * FROM Managers"));
-		}
+            string archiveQuery = "INSERT INTO ArchivedManagers SELECT * FROM Managers WHERE Id = @ManagerId";
+            string deleteQuery = "DELETE FROM Managers WHERE Id = @ManagerId";
+            SqlCommand cmdArchive = new(archiveQuery);
+            SqlCommand cmdDelete = new(deleteQuery);
 
-		private void DisplayMaxQuantityProducts(PointDB db)
-		{
-			string query = "SELECT TOP 1 * FROM Products ORDER BY Quantity DESC";
-			TV.DisplayTable(db.ExecuteQuery(query));
-		}
+            cmdArchive.Parameters.AddWithValue("@ManagerId", managerId);
+            cmdDelete.Parameters.AddWithValue("@ManagerId", managerId);
 
-		private void DisplayMinQuantityProducts(PointDB db)
-		{
-			string query = "SELECT TOP 1 * FROM Products ORDER BY Quantity ASC";
-			TV.DisplayTable(db.ExecuteQuery(query));
-		}
+            db.ExecuteNonQuery(cmdArchive);
+            db.ExecuteNonQuery(cmdDelete);
+            WindowsHandler.AddInfoWindow(["Менеджер успешно удален и архивирован!"]);
+        }
 
-		private void DisplayMinCostPriceProducts(PointDB db)
-		{
-			string query = "SELECT TOP 1 * FROM Products ORDER BY CostPrice ASC";
-			TV.DisplayTable(db.ExecuteQuery(query));
-		}
+        private void DeleteProductType(PointDB db)
+        {
+            TV.DisplayTable(db.ExecuteQuery("SELECT * FROM ProductType"));
+            Console.Write("Введите ID типа товара для удаления: ");
+            int typeId = int.Parse(Console.ReadLine());
 
-		private void DisplayMaxCostPriceProducts(PointDB db)
-		{
-			string query = "SELECT TOP 1 * FROM Products ORDER BY CostPrice DESC";
-			TV.DisplayTable(db.ExecuteQuery(query));
-		}
+            string archiveQuery = "INSERT INTO ArchivedProductTypes SELECT * FROM ProductType WHERE Id = @TypeId";
+            string deleteQuery = "DELETE FROM ProductType WHERE Id = @TypeId";
+            SqlCommand cmdArchive = new(archiveQuery);
+            SqlCommand cmdDelete = new(deleteQuery);
 
-		public enum ProgramOptions
-		{
-			DisplayAllProducts,
-			DisplayAllProductTypes,
-			DisplayAllManagers,
-			DisplayMaxQuantityProducts,
-			DisplayMinQuantityProducts,
-			DisplayMinCostPriceProducts,
-			DisplayMaxCostPriceProducts,
-			Back,
-			CountOptions
-		}
-	}
+            cmdArchive.Parameters.AddWithValue("@TypeId", typeId);
+            cmdDelete.Parameters.AddWithValue("@TypeId", typeId);
+
+            db.ExecuteNonQuery(cmdArchive);
+            db.ExecuteNonQuery(cmdDelete);
+            WindowsHandler.AddInfoWindow(["Тип товара успешно удален и архивирован!"]);
+        }
+
+        private void DeleteFirm(PointDB db)
+        {
+            TV.DisplayTable(db.ExecuteQuery("SELECT * FROM Firms"));
+            Console.Write("Введите ID фирмы для удаления: ");
+            int firmId = int.Parse(Console.ReadLine());
+
+            string archiveQuery = "INSERT INTO ArchivedFirms SELECT * FROM Firms WHERE Id = @FirmId";
+            string deleteQuery = "DELETE FROM Firms WHERE Id = @FirmId";
+            SqlCommand cmdArchive = new(archiveQuery);
+            SqlCommand cmdDelete = new(deleteQuery);
+
+            cmdArchive.Parameters.AddWithValue("@FirmId", firmId);
+            cmdDelete.Parameters.AddWithValue("@FirmId", firmId);
+
+            db.ExecuteNonQuery(cmdArchive);
+            db.ExecuteNonQuery(cmdDelete);
+            WindowsHandler.AddInfoWindow(["Фирма успешно удалена и архивирована!"]);
+        }
+
+        public enum ProgramOptions
+        {
+            DeleteProduct,
+            DeleteManager,
+            DeleteProductType,
+            DeleteFirm,
+            Back,
+            CountOptions
+        }
+    }
 }
