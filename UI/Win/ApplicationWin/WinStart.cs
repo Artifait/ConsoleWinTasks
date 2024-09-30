@@ -1,6 +1,8 @@
 ﻿
 #nullable enable
 
+using ConsoleWinApp.UI.Win.ApplicationWin;
+
 namespace QuizTop.UI.Win.ApplicationWin
 {
     public class WinStart : IWin
@@ -34,12 +36,12 @@ namespace QuizTop.UI.Win.ApplicationWin
             Console.Clear();
             switch ((ProgramOptions)windowDisplay.CursorPosition)
             {
-                //case ProgramOptions.Task3:
-                //    Application.WinStack.Push(WindowsHandler.GetWindow<Task3>());
-                //    break;
-                //case ProgramOptions.Task4:
-                //    Application.WinStack.Push(WindowsHandler.GetWindow<Task4>());
-                //    break;
+                case ProgramOptions.Task3:
+                    Application.WinStack.Push(WindowsHandler.GetWindow<Task3>());
+                    break;
+                case ProgramOptions.Task4:
+                    Application.WinStack.Push(WindowsHandler.GetWindow<Task4>());
+                    break;
                 case ProgramOptions.Exit:
                     Application.IsRunning = false;
                     break;
