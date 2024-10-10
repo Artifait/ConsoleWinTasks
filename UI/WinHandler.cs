@@ -48,7 +48,19 @@ namespace QuizTop.UI
             window.UpdateInfoMsg(stringList1.ToArray());
             Application.WinStack.Push(window);
         }
+        public static void AddInfoWindow(object[]? messages)
+        {
+            WinInfo window = GetWindow<WinInfo>();
+            List<string> stringList1 = new();
+            if (messages == null)
+                stringList1.Add("Нет Сообщений");
+            else
+                foreach (var message in messages)
+                    stringList1.Add(message.ToString());
 
+            window.UpdateInfoMsg(stringList1.ToArray());
+            Application.WinStack.Push(window);
+        }
         public static string PadCenter(this string str, int totalWidth)
         {
             int count1 = (totalWidth - str.Length) / 2;
