@@ -1,5 +1,4 @@
-﻿using Microsoft.Data.SqlClient;
-using QuizTop;
+﻿using QuizTop;
 using QuizTop.UI;
 using static QuizTop.UI.Win.ApplicationWin.WinStart;
 
@@ -7,7 +6,7 @@ namespace ConsoleWinApp.UI.Win.ApplicationWin;
 
 public class Task3 : IWin
 {
-    public WindowDisplay windowDisplay = new("Task 3: Display Operations", typeof(ProgramOptions));
+    public WindowDisplay windowDisplay = new("Task 3: Coffee Stats by Country", typeof(ProgramOptions));
 
     public WindowDisplay WindowDisplay
     {
@@ -39,28 +38,28 @@ public class Task3 : IWin
 
         switch ((ProgramOptions)windowDisplay.CursorPosition)
         {
-            case ProgramOptions.DisplayAllCoffee:
-                DisplayAllCoffee(db);
+            case ProgramOptions.DisplayCountryCoffeeCount:
+                DisplayCountryCoffeeCount(db);
                 break;
 
-            case ProgramOptions.DisplayCoffeeNames:
-                DisplayCoffeeNames(db);
+            case ProgramOptions.DisplayAvgQuantityByCountry:
+                DisplayAvgQuantityByCountry(db);
                 break;
 
-            case ProgramOptions.DisplayArabica:
-                DisplayArabica(db);
+            case ProgramOptions.DisplayTopCheapCoffeeByCountry:
+                DisplayTopCheapCoffeeByCountry(db, "Colombia"); // Укажите страну
                 break;
 
-            case ProgramOptions.DisplayRobusta:
-                DisplayRobusta(db);
+            case ProgramOptions.DisplayTopExpensiveCoffeeByCountry:
+                DisplayTopExpensiveCoffeeByCountry(db, "Brazil"); // Укажите страну
                 break;
 
-            case ProgramOptions.DisplayBlends:
-                DisplayBlends(db);
+            case ProgramOptions.DisplayTopCheapCoffee:
+                DisplayTopCheapCoffee(db);
                 break;
 
-            case ProgramOptions.DisplayLowStockCoffee:
-                DisplayLowStockCoffee(db);
+            case ProgramOptions.DisplayTopExpensiveCoffee:
+                DisplayTopExpensiveCoffee(db);
                 break;
 
             case ProgramOptions.Back:
@@ -69,53 +68,50 @@ public class Task3 : IWin
         }
     }
 
-    private void DisplayAllCoffee(PointDB db)
+    private void DisplayCountryCoffeeCount(PointDB db)
     {
-        string query = "SELECT CoffeeID, CoffeeName, CountryName, CoffeeTypeName, Description, QuantityInGrams, CostPrice " +
-                       "FROM Coffee " +
-                       "JOIN Countries ON Coffee.CountryID = Countries.Id " +
-                       "JOIN CoffeeTypes ON Coffee.CoffeeTypeID = CoffeeTypes.Id";
+        string query = "SELECT CountryName, COUNT(CoffeeID) AS CoffeeCount FROM Coffee JOIN Countries ON Coffee.CountryID = Countries.Id GROUP BY CountryName";
         TV.DisplayTable(db.ExecuteQuery(query));
     }
 
-    private void DisplayCoffeeNames(PointDB db)
+    private void DisplayAvgQuantityByCountry(PointDB db)
     {
-        string query = "SELECT CoffeeName FROM Coffee";
+        string query = "SELECT CountryName, AVG(QuantityInGrams) AS AvgQuantity FROM Coffee JOIN Countries ON Coffee.CountryID = Countries.Id GROUP BY CountryName";
         TV.DisplayTable(db.ExecuteQuery(query));
     }
 
-    private void DisplayArabica(PointDB db)
+    private void DisplayTopCheapCoffeeByCountry(PointDB db, string country)
     {
-        string query = "SELECT CoffeeName FROM Coffee WHERE CoffeeTypeID = (SELECT Id FROM CoffeeTypes WHERE CoffeeTypeName = 'Arabica')";
+        string query = $"SELECT TOP 3 * FROM Coffee JOIN Countries ON Coffee.CountryID = Countries.Id WHERE CountryName = '{country}' ORDER BY CostPrice ASC";
         TV.DisplayTable(db.ExecuteQuery(query));
     }
 
-    private void DisplayRobusta(PointDB db)
+    private void DisplayTopExpensiveCoffeeByCountry(PointDB db, string country)
     {
-        string query = "SELECT CoffeeName FROM Coffee WHERE CoffeeTypeID = (SELECT Id FROM CoffeeTypes WHERE CoffeeTypeName = 'Robusta')";
+        string query = $"SELECT TOP 3 * FROM Coffee JOIN Countries ON Coffee.CountryID = Countries.Id WHERE CountryName = '{country}' ORDER BY CostPrice DESC";
         TV.DisplayTable(db.ExecuteQuery(query));
     }
 
-    private void DisplayBlends(PointDB db)
+    private void DisplayTopCheapCoffee(PointDB db)
     {
-        string query = "SELECT CoffeeName FROM Coffee WHERE CoffeeTypeID = (SELECT Id FROM CoffeeTypes WHERE CoffeeTypeName = 'Blend')";
+        string query = "SELECT TOP 3 * FROM Coffee ORDER BY CostPrice ASC";
         TV.DisplayTable(db.ExecuteQuery(query));
     }
 
-    private void DisplayLowStockCoffee(PointDB db)
+    private void DisplayTopExpensiveCoffee(PointDB db)
     {
-        string query = "SELECT CoffeeName FROM Coffee WHERE QuantityInGrams <= 200";
+        string query = "SELECT TOP 3 * FROM Coffee ORDER BY CostPrice DESC";
         TV.DisplayTable(db.ExecuteQuery(query));
     }
 
     public enum ProgramOptions
     {
-        DisplayAllCoffee,
-        DisplayCoffeeNames,
-        DisplayArabica,
-        DisplayRobusta,
-        DisplayBlends,
-        DisplayLowStockCoffee,
+        DisplayCountryCoffeeCount,
+        DisplayAvgQuantityByCountry,
+        DisplayTopCheapCoffeeByCountry,
+        DisplayTopExpensiveCoffeeByCountry,
+        DisplayTopCheapCoffee,
+        DisplayTopExpensiveCoffee,
         Back,
         CountOptions
     }

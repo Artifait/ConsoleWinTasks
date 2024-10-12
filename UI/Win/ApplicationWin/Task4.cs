@@ -6,7 +6,7 @@ namespace ConsoleWinApp.UI.Win.ApplicationWin;
 
 public class Task4 : IWin
 {
-    public WindowDisplay windowDisplay = new("Task 4: Coffee Statistics", typeof(ProgramOptions));
+    public WindowDisplay windowDisplay = new("Task 4: Top Coffee Stats", typeof(ProgramOptions));
 
     public WindowDisplay WindowDisplay
     {
@@ -38,28 +38,28 @@ public class Task4 : IWin
 
         switch ((ProgramOptions)windowDisplay.CursorPosition)
         {
-            case ProgramOptions.DisplayMinCostPrice:
-                DisplayMinCostPrice(db);
+            case ProgramOptions.DisplayTopCountriesByCoffeeCount:
+                DisplayTopCountriesByCoffeeCount(db);
                 break;
 
-            case ProgramOptions.DisplayMaxCostPrice:
-                DisplayMaxCostPrice(db);
+            case ProgramOptions.DisplayTopCountriesByQuantity:
+                DisplayTopCountriesByQuantity(db);
                 break;
 
-            case ProgramOptions.DisplayAvgCostPrice:
-                DisplayAvgCostPrice(db);
+            case ProgramOptions.DisplayTopArabicaByQuantity:
+                DisplayTopArabicaByQuantity(db);
                 break;
 
-            case ProgramOptions.DisplayCountMinCostPrice:
-                DisplayCountMinCostPrice(db);
+            case ProgramOptions.DisplayTopRobustaByQuantity:
+                DisplayTopRobustaByQuantity(db);
                 break;
 
-            case ProgramOptions.DisplayCountMaxCostPrice:
-                DisplayCountMaxCostPrice(db);
+            case ProgramOptions.DisplayTopBlendByQuantity:
+                DisplayTopBlendByQuantity(db);
                 break;
 
-            case ProgramOptions.DisplayCoffeeTypeCount:
-                DisplayCoffeeTypeCount(db);
+            case ProgramOptions.DisplayTopByTypeQuantity:
+                DisplayTopByTypeQuantity(db);
                 break;
 
             case ProgramOptions.Back:
@@ -68,55 +68,60 @@ public class Task4 : IWin
         }
     }
 
-    private void DisplayMinCostPrice(PointDB db)
+    private void DisplayTopCountriesByCoffeeCount(PointDB db)
     {
-        string query = "SELECT MIN(CostPrice) AS MinCostPrice FROM Coffee";
+        string query = "SELECT TOP 3 CountryName, COUNT(CoffeeID) AS CoffeeCount FROM Coffee JOIN Countries ON Coffee.CountryID = Countries.Id GROUP BY CountryName ORDER BY CoffeeCount DESC";
         TV.DisplayTable(db.ExecuteQuery(query));
     }
 
-    private void DisplayMaxCostPrice(PointDB db)
+    private void DisplayTopCountriesByQuantity(PointDB db)
     {
-        string query = "SELECT MAX(CostPrice) AS MaxCostPrice FROM Coffee";
+        string query = "SELECT TOP 3 CountryName, SUM(QuantityInGrams) AS TotalQuantity FROM Coffee JOIN Countries ON Coffee.CountryID = Countries.Id GROUP BY CountryName ORDER BY TotalQuantity DESC";
         TV.DisplayTable(db.ExecuteQuery(query));
     }
 
-    private void DisplayAvgCostPrice(PointDB db)
+    private void DisplayTopArabicaByQuantity(PointDB db)
     {
-        string query = "SELECT AVG(CostPrice) AS AvgCostPrice FROM Coffee";
+        string query = "SELECT TOP 3 CoffeeName, QuantityInGrams FROM Coffee WHERE CoffeeTypeID = (SELECT Id FROM CoffeeTypes WHERE CoffeeTypeName = 'Arabica') ORDER BY QuantityInGrams DESC";
         TV.DisplayTable(db.ExecuteQuery(query));
     }
 
-    private void DisplayCountMinCostPrice(PointDB db)
+    private void DisplayTopRobustaByQuantity(PointDB db)
     {
-        string query = "SELECT COUNT(*) AS CountMinCostPrice FROM Coffee WHERE CostPrice = (SELECT MIN(CostPrice) FROM Coffee)";
+        string query = "SELECT TOP 3 CoffeeName, QuantityInGrams FROM Coffee WHERE CoffeeTypeID = (SELECT Id FROM CoffeeTypes WHERE CoffeeTypeName = 'Robusta') ORDER BY QuantityInGrams DESC";
         TV.DisplayTable(db.ExecuteQuery(query));
     }
 
-    private void DisplayCountMaxCostPrice(PointDB db)
+    private void DisplayTopBlendByQuantity(PointDB db)
     {
-        string query = "SELECT COUNT(*) AS CountMaxCostPrice FROM Coffee WHERE CostPrice = (SELECT MAX(CostPrice) FROM Coffee)";
+        string query = "SELECT TOP 3 CoffeeName, QuantityInGrams FROM Coffee WHERE CoffeeTypeID = (SELECT Id FROM CoffeeTypes WHERE CoffeeTypeName = 'Blend') ORDER BY QuantityInGrams DESC";
         TV.DisplayTable(db.ExecuteQuery(query));
     }
 
-    private void DisplayCoffeeTypeCount(PointDB db)
+    private void DisplayTopByTypeQuantity(PointDB db)
     {
         string query = @"
-                SELECT 
-                    (SELECT COUNT(*) FROM Coffee WHERE CoffeeTypeID = (SELECT Id FROM CoffeeTypes WHERE CoffeeTypeName = 'Arabica')) AS ArabicaCount,
-                    (SELECT COUNT(*) FROM Coffee WHERE CoffeeTypeID = (SELECT Id FROM CoffeeTypes WHERE CoffeeTypeName = 'Robusta')) AS RobustaCount,
-                    (SELECT COUNT(*) FROM Coffee WHERE CoffeeTypeID = (SELECT Id FROM CoffeeTypes WHERE CoffeeTypeName = 'Blend')) AS BlendCount";
+                SELECT CoffeeTypeName, CoffeeName, QuantityInGrams 
+                FROM (
+                    SELECT CoffeeTypeName, CoffeeName, QuantityInGrams,
+                           ROW_NUMBER() OVER (PARTITION BY CoffeeTypeID ORDER BY QuantityInGrams DESC) AS Rank
+                    FROM Coffee 
+                    JOIN CoffeeTypes ON Coffee.CoffeeTypeID = CoffeeTypes.Id
+                ) AS RankedCoffee
+                WHERE Rank <= 3";
         TV.DisplayTable(db.ExecuteQuery(query));
     }
 
     public enum ProgramOptions
     {
-        DisplayMinCostPrice,
-        DisplayMaxCostPrice,
-        DisplayAvgCostPrice,
-        DisplayCountMinCostPrice,
-        DisplayCountMaxCostPrice,
-        DisplayCoffeeTypeCount,
+        DisplayTopCountriesByCoffeeCount,
+        DisplayTopCountriesByQuantity,
+        DisplayTopArabicaByQuantity,
+        DisplayTopRobustaByQuantity,
+        DisplayTopBlendByQuantity,
+        DisplayTopByTypeQuantity,
         Back,
         CountOptions
     }
 }
+

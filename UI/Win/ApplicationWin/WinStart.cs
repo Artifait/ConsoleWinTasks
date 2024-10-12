@@ -36,6 +36,12 @@ public class WinStart : IWin
         Console.Clear();
         switch ((ProgramOptions)windowDisplay.CursorPosition)
         {
+            case ProgramOptions.Task1:
+                Application.WinStack.Push(WindowsHandler.GetWindow<Task1>());
+                break;
+            case ProgramOptions.Task2:
+                Application.WinStack.Push(WindowsHandler.GetWindow<Task2>());
+                break;
             case ProgramOptions.Task3:
                 Application.WinStack.Push(WindowsHandler.GetWindow<Task3>());
                 break;
@@ -50,6 +56,8 @@ public class WinStart : IWin
 
     public enum ProgramOptions
     {
+        Task1,
+        Task2,
         Task3,  
         Task4,
         Exit,

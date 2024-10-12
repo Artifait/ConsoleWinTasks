@@ -17,7 +17,7 @@ namespace QuizTop
         private static void Init()
         {
             Console.Title = "Tasks";
-            Console.SetWindowSize(80, 40);
+            Console.SetWindowSize(150, 40);
             WinStack.Push(WindowsHandler.GetWindow<WinStart>());
 
             db.OpenDB();

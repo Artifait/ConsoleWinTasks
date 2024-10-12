@@ -23,7 +23,7 @@ public class PointDB
         }
         catch (Exception ex)
         {
-            WindowsHandler.AddErroreWindow([ex.Message], true);
+            WindowsHandler.AddErroreWindow([ ex.Message ], true);
         }
         return false;
     }
@@ -48,7 +48,7 @@ public class PointDB
         }
         catch (Exception ex)
         {
-            WindowsHandler.AddErroreWindow(["Ошибка выполнения запроса", ex.Message], true);
+            WindowsHandler.AddErroreWindow([ "Ошибка выполнения запроса", ex.Message ], true);
         }
         finally
         {
@@ -71,7 +71,30 @@ public class PointDB
         catch (Exception ex)
         {
             CloseDB();
-            WindowsHandler.AddErroreWindow(["Сломалась база данных :(", ex.Message], true);
+            WindowsHandler.AddErroreWindow([ "Сломалась база данных :(", ex.Message ], true);
+        }
+        return dt;
+    }
+
+    public DataTable ExecuteQuery(string query, SqlParameter[] parameters)
+    {
+        DataTable dt = new();
+        try
+        {
+            if (OpenDB())
+            {
+                using SqlCommand cmd = new(query, conn);
+                foreach (SqlParameter p in parameters)
+                    cmd.Parameters.AddWithValue(p.ParameterName, p.Value);
+
+                using SqlDataAdapter adapter = new(cmd);
+                adapter.Fill(dt);
+            }
+        }
+        catch (Exception ex)
+        {
+            CloseDB();
+            WindowsHandler.AddErroreWindow([ "Сломалась база данных :(", ex.Message ], true);
         }
         return dt;
     }
@@ -91,7 +114,7 @@ public class PointDB
         catch (Exception ex)
         {
             CloseDB();
-            WindowsHandler.AddErroreWindow(["Сломалась база данных :(", ex.Message], true);
+            WindowsHandler.AddErroreWindow([ "Сломалась база данных :(", ex.Message ], true);
         }
         return dt;
     }
