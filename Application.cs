@@ -11,7 +11,7 @@ namespace QuizTop
         public static Stack<IWin> WinStack = new();
         public static bool IsRunning = false;
         public static string PathData = Directory.GetCurrentDirectory();
-        public static PointDB dB = new("Fruits");
+        public static PointDB db = new("CoffeeShop");
         public static bool CursorVisible { get; set; } = false;
 
         private static void Init()
@@ -20,8 +20,8 @@ namespace QuizTop
             Console.SetWindowSize(80, 40);
             WinStack.Push(WindowsHandler.GetWindow<WinStart>());
 
-            dB.OpenDB();
-            if (!dB.IsWork())
+            db.OpenDB();
+            if (!db.IsWork())
             {
                 Console.Clear();
                 Console.WriteLine("НЕ удалось открыть бд");

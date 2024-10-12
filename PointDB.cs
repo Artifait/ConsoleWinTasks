@@ -5,11 +5,10 @@ using Microsoft.Data.SqlClient;
 public class PointDB
 {
     SqlConnection conn;
+
     public PointDB(string database, string server = @"(localdb)\MSSQLLocalDB")
     {
-        string conStr = $@"Server={server};
-                        Database={database};
-                        Trusted_Connection=True;";
+        string conStr = $@"Server={server};Database={database};Trusted_Connection=True;";
         conn = new SqlConnection(conStr);
     }
 
@@ -37,7 +36,47 @@ public class PointDB
 
     public bool IsWork() => conn.State == ConnectionState.Open;
 
-    private DataTable ExecuteQuery(string query)
+    public void ExecuteNonQuery(SqlCommand cmd)
+    {
+        try
+        {
+            if (OpenDB())
+            {
+                cmd.Connection = conn;
+                cmd.ExecuteNonQuery();
+            }
+        }
+        catch (Exception ex)
+        {
+            WindowsHandler.AddErroreWindow(["Ошибка выполнения запроса", ex.Message], true);
+        }
+        finally
+        {
+            CloseDB();
+        }
+    }
+
+    public DataTable ExecuteQuery(SqlCommand cmd)
+    {
+        DataTable dt = new();
+        try
+        {
+            if (OpenDB())
+            {
+                cmd.Connection = conn;
+                using SqlDataAdapter adapter = new(cmd);
+                adapter.Fill(dt);
+            }
+        }
+        catch (Exception ex)
+        {
+            CloseDB();
+            WindowsHandler.AddErroreWindow(["Сломалась база данных :(", ex.Message], true);
+        }
+        return dt;
+    }
+
+    public DataTable ExecuteQuery(string query)
     {
         DataTable dt = new();
         try
@@ -52,7 +91,7 @@ public class PointDB
         catch (Exception ex)
         {
             CloseDB();
-            WindowsHandler.AddErroreWindow(["Сломалась бд :(", ex.Message], true);
+            WindowsHandler.AddErroreWindow(["Сломалась база данных :(", ex.Message], true);
         }
         return dt;
     }
