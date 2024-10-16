@@ -1,19 +1,15 @@
 ﻿
-using System;
+namespace ConsoleWinTasks.UI;
 
-#nullable enable
-namespace QuizTop.UI
+public interface IWin
 {
-    public interface IWin
-    {
-        Type? ProgramOptionsType { get; }
-        Type? ProgramFieldsType { get; }
-        WindowDisplay WindowDisplay { get; set; }
+    Type? ProgramOptionsType { get; }
+    Type? ProgramFieldsType { get; }
+    WindowDisplay WindowDisplay { get; set; }
 
-        void Show();
-        void InputHandler();
+    void Show();
+    void InputHandler();
 
-        int SizeX { get; }
-        int SizeY { get; }
-    }
+    int SizeX { get; }
+    int SizeY { get; }
 }

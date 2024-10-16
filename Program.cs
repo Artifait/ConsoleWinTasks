@@ -1,9 +1,7 @@
 ﻿
-#nullable enable
-namespace QuizTop
+namespace ConsoleWinTasks;
+
+internal class Program
 {
-    internal class Program
-    {
-        private static void Main(string[] args) => Application.Run();
-    }
+    private static void Main() => Application.Run();
 }

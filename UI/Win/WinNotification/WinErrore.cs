@@ -1,6 +1,6 @@
 ﻿
 #nullable enable
-namespace QuizTop.UI.Win.WinNotification
+namespace ConsoleWinTasks.UI.Win.WinNotification
 {
     public class WinErrore : IWin
     {
