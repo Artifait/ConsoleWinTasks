@@ -2,7 +2,6 @@
 ## Documentation of FrameWork
 
 ### Класс - зачем он:
-* Application - НАДО
 * WindowsHandler - Для менеджмента/хранения используемых окон + добавления, оповещяющих пользователя окон - AddErroreWindow(string[] msgs, bool isFatal = false), AddInfoWindow(string[] msgs)
 * WindowTools - Туда вынесена вся логика, которая используется всеми окнами 
 * WindowDisplay - Там все Данные + Логика, для правльной отрисовки в консоли
