@@ -43,6 +43,9 @@ public class WinStart : IWin
             case ProgramOptions.Task3:
                 Application.WinStack.Push(WindowsHandler.GetWindow<Task3>());
                 break;
+            case ProgramOptions.Task4:
+                Application.WinStack.Push(WindowsHandler.GetWindow<Task4>());
+                break;
             case ProgramOptions.Exit:
                 Application.IsRunning = false;
                 break;
@@ -53,6 +56,7 @@ public class WinStart : IWin
     {
         Task2,
         Task3,
+        Task4,
         Exit,
         CountOptions,
     }

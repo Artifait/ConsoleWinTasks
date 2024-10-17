@@ -2,16 +2,13 @@
 using ConsoleWinTasks;
 using QuizTop;
 using QuizTop.UI;
-using System.Threading.Tasks;
 
 namespace ConsoleWinTasks.UI.Win.ApplicationWin;
-
-
 
 public class Task3 : IWin
 {
     #region DefaultPart
-    public WindowDisplay windowDisplay = new("Task 1: Insert Operations", typeof(ProgramOptions));
+    public WindowDisplay windowDisplay = new("Task 3: Show data", typeof(ProgramOptions));
 
     public WindowDisplay WindowDisplay
     {
@@ -46,19 +43,19 @@ public class Task3 : IWin
         {
             // Задание 3
             case ProgramOptions.ShowCapitalsWithAP:
-                ShowCapitalsWithAP(); // Используем Task3
+                ShowCapitalsWithAP(); 
                 break;
 
             case ProgramOptions.ShowCapitalsStartingWithK:
-                ShowCapitalsStartingWithK(); // Используем Task3
+                ShowCapitalsStartingWithK(); 
                 break;
 
             case ProgramOptions.ShowCountriesInAreaRange:
-                ShowCountriesInAreaRange(); // Используем Task3
+                ShowCountriesInAreaRange();
                 break;
 
             case ProgramOptions.ShowCountriesWithPopulationOver:
-                ShowCountriesWithPopulationOver(); // Используем Task3
+                ShowCountriesWithPopulationOver();
                 break;
 
             case ProgramOptions.Back:
@@ -67,7 +64,6 @@ public class Task3 : IWin
         }
     }
 
-    // 1. Отобразить все столицы, у которых в названии есть буквы a, p
     public void ShowCapitalsWithAP()
     {
         using (var context = new CountriesContext())
@@ -80,7 +76,6 @@ public class Task3 : IWin
         }
     }
 
-    // 2. Отобразить все столицы, у которых название начинается с буквы k
     public void ShowCapitalsStartingWithK()
     {
         using (var context = new CountriesContext())
@@ -93,7 +88,6 @@ public class Task3 : IWin
         }
     }
 
-    // 3. Отобразить название стран, у которых площадь находится в указанном диапазоне
     public void ShowCountriesInAreaRange()
     {
         Console.WriteLine("Введите минимальную площадь:");
@@ -122,7 +116,6 @@ public class Task3 : IWin
         }
     }
 
-    // 4. Отобразить название стран, у которых количество жителей больше указанного числа
     public void ShowCountriesWithPopulationOver()
     {
         Console.WriteLine("Введите минимальное количество жителей:");
@@ -144,10 +137,10 @@ public class Task3 : IWin
     }
     public enum ProgramOptions
     {
-        ShowCapitalsWithAP,                // Добавлено
-        ShowCapitalsStartingWithK,         // Добавлено
-        ShowCountriesInAreaRange,          // Добавлено
-        ShowCountriesWithPopulationOver,    // Добавлено
+        ShowCapitalsWithAP,              
+        ShowCapitalsStartingWithK,       
+        ShowCountriesInAreaRange,          
+        ShowCountriesWithPopulationOver,   
         Back,
         CountOptions
     }

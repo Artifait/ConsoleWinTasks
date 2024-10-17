@@ -6,7 +6,7 @@ using QuizTop.UI;
 public class Task2 : IWin
 {
     #region DefaultPart
-    public WindowDisplay windowDisplay = new("Task 1: Insert Operations", typeof(ProgramOptions));
+    public WindowDisplay windowDisplay = new("Task 1: Show Data", typeof(ProgramOptions));
 
     public WindowDisplay WindowDisplay
     {
