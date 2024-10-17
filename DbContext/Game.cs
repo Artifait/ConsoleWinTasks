@@ -12,4 +12,6 @@ public partial class Game
     public string? StuleGame { get; set; }
 
     public DateOnly ReleaseDate { get; set; }
+    public string? GameMode { get; set; } // Новое свойство
+    public int CopiesSold { get; set; }  // Новое свойство
 }
