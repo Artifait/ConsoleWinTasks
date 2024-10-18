@@ -1,239 +1,197 @@
 ﻿using ConsoleWinApp.UI;
 using ConsoleWinTasks;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 using QuizTop;
 using QuizTop.UI;
+using System.Diagnostics;
+using System.IO;
 
-namespace ConsoleWinTasks.UI.Win.ApplicationWin;
-
-public class Task4 : IWin
+namespace ConsoleWinTasks.UI.Win.ApplicationWin
 {
-    #region DefaultPart
-    public WindowDisplay windowDisplay = new("Task 4: Show TOPS", typeof(ProgramOptions));
-
-    public WindowDisplay WindowDisplay
+    public class Task4 : IWin
     {
-        get => windowDisplay;
-        set => windowDisplay = value;
-    }
+        #region DefaultPart
+        public WindowDisplay windowDisplay = new("Task 4: Extended Reports System", typeof(ProgramOptions));
 
-    public Type? ProgramOptionsType => typeof(ProgramOptions);
-    public Type? ProgramFieldsType => null;
-
-    public int SizeX => windowDisplay.MaxLeft;
-    public int SizeY => windowDisplay.MaxTop;
-
-    public void Show() => windowDisplay.Show();
-
-    public void InputHandler()
-    {
-        char lower = char.ToLower(Console.ReadKey().KeyChar);
-        WindowTools.UpdateCursorPos(lower, ref windowDisplay, (int)ProgramOptions.CountOptions);
-
-        if (WindowTools.IsKeySelect(lower)) HandleMenuOption();
-    }
-    #endregion
-
-    private void HandleMenuOption()
-    {
-        Console.Clear();
-        PointDB db = Application.dB;
-
-        Console.CursorTop = SizeY;
-        switch ((ProgramOptions)windowDisplay.CursorPosition)
+        public WindowDisplay WindowDisplay
         {
-            case ProgramOptions.ShowTop5CountriesByArea:
-                ShowTop5CountriesByArea();
-                break;
-
-            case ProgramOptions.ShowTop5CapitalsByPopulation:
-                ShowTop5CapitalsByPopulation();
-                break;
-
-            case ProgramOptions.ShowLargestCountryByArea:
-                ShowLargestCountryByArea();
-                break;
-
-            case ProgramOptions.ShowLargestCapitalByPopulation:
-                ShowLargestCapitalByPopulation();
-                break;
-
-            case ProgramOptions.ShowSmallestCountryInEuropeByArea:
-                ShowSmallestCountryInEuropeByArea();
-                break;
-
-            case ProgramOptions.ShowAverageAreaOfEuropeanCountries:
-                ShowAverageAreaOfEuropeanCountries();
-                break;
-
-            case ProgramOptions.ShowTop3CitiesByPopulationInCountry:
-                ShowTop3CitiesByPopulationInCountry();
-                break;
-
-            case ProgramOptions.ShowTotalNumberOfCountries:
-                ShowTotalNumberOfCountries();
-                break;
-
-            case ProgramOptions.ShowContinentWithMaxCountries:
-                ShowContinentWithMaxCountries();
-                break;
-
-            case ProgramOptions.ShowNumberOfCountriesPerContinent:
-                ShowNumberOfCountriesPerContinent();
-                break;
-
-            case ProgramOptions.Back:
-                Application.WinStack.Pop();
-                break;
+            get => windowDisplay;
+            set => windowDisplay = value;
         }
-    }
 
-    public void ShowTop5CountriesByArea()
-    {
-        using (var context = new CountriesContext())
+        public Type? ProgramOptionsType => typeof(ProgramOptions);
+        public Type? ProgramFieldsType => null;
+
+        public int SizeX => windowDisplay.MaxLeft;
+        public int SizeY => windowDisplay.MaxTop;
+
+        public void Show() => windowDisplay.Show();
+
+        public void InputHandler()
         {
-            var query = context.Countries
-                        .OrderByDescending(c => c.Area)
-                        .Take(5)
-                        .Select(c => new { c.CountryName, c.Area });
-            TV.DisplayTable(query);
+            char lower = char.ToLower(Console.ReadKey().KeyChar);
+            WindowTools.UpdateCursorPos(lower, ref windowDisplay, (int)ProgramOptions.CountOptions);
+
+            if (WindowTools.IsKeySelect(lower)) HandleMenuOption();
         }
-    }
+        #endregion
 
-    public void ShowTop5CapitalsByPopulation()
-    {
-        using (var context = new CountriesContext())
+        private void HandleMenuOption()
         {
-            var query = context.Cities
-                        .OrderByDescending(c => c.CityPopulation)
-                        .Take(5)
-                        .Select(c => new { c.CityName, c.CityPopulation });
-            TV.DisplayTable(query);
-        }
-    }
+            Console.Clear();
+            PointDB db = Application.dB;
 
-    public void ShowLargestCountryByArea()
-    {
-        using (var context = new CountriesContext())
-        {
-            var query = context.Countries
-                        .OrderByDescending(c => c.Area)
-                        .FirstOrDefault();
-            if (query != null)
+            Console.CursorTop = SizeY;
+            switch ((ProgramOptions)windowDisplay.CursorPosition)
             {
-                TV.DisplayTable(new[] { new { query.CountryName, query.Area } });
+                case ProgramOptions.ShowTop3CountriesByContinentMinPopulation:
+                    ShowTop3CountriesByContinentMinPopulation();
+                    break;
+
+                case ProgramOptions.ShowTop3CountriesByContinentMaxPopulation:
+                    ShowTop3CountriesByContinentMaxPopulation();
+                    break;
+
+                case ProgramOptions.ShowAveragePopulationInCountry:
+                    ShowAveragePopulationInCountry();
+                    break;
+
+                case ProgramOptions.ShowSmallestCityByPopulationInCountry:
+                    ShowSmallestCityByPopulationInCountry();
+                    break;
+
+                case ProgramOptions.Back:
+                    Application.WinStack.Pop();
+                    break;
             }
         }
-    }
 
-    public void ShowLargestCapitalByPopulation()
-    {
-        using (var context = new CountriesContext())
+        // Показать топ-3 стран по каждой части света с наименьшим количеством жителей
+        public void ShowTop3CountriesByContinentMinPopulation()
         {
-            var query = context.Cities
-                        .OrderByDescending(c => c.CityPopulation)
-                        .FirstOrDefault();
-            if (query != null)
+            Console.Write("Выберите вывод на экран (E) или в файл (F): ");
+            char outputChoice = char.ToUpper(Console.ReadKey().KeyChar);
+            Console.WriteLine();
+            using (var context = new CountriesContext())
             {
-                TV.DisplayTable(new[] { new { query.CityName, query.CityPopulation } });
+                var continents = context.Continents
+                                        .Include(c => c.Countries) 
+                                        .ToList();
+
+
+                foreach (var continent in continents)
+                {
+                    Console.WriteLine(continent.ContinentName);
+
+                    var top3Countries = continent.Countries
+                                                 .OrderBy(c => c.Population)
+                                                 .Take(3)
+                                                 .Select(c => new { c.CountryName, c.Population })
+                                                 .ToList();
+
+                    if (top3Countries.Any())
+                    {
+                        Task2.OutputReport(top3Countries, outputChoice, $"{continent.ContinentName}_Top3MinPopulation.txt");
+                    }
+                    else
+                    {
+                        WindowsHandler.AddInfoWindow(new[] { $"В континенте '{continent.ContinentName}' нет данных." });
+                    }
+                }
             }
         }
-    }
 
-    public void ShowSmallestCountryInEuropeByArea()
-    {
-        using (var context = new CountriesContext())
+        // Показать топ-3 стран по каждой части света с наибольшим количеством жителей
+        public void ShowTop3CountriesByContinentMaxPopulation()
         {
-            var query = context.Countries
-                        .Where(c => c.IdContinentNavigation.ContinentName == "Europe")
-                        .OrderBy(c => c.Area)
-                        .FirstOrDefault();
-            if (query != null)
+            Console.Write("Выберите вывод на экран (E) или в файл (F): ");
+            char outputChoice = char.ToUpper(Console.ReadKey().KeyChar);
+            Console.WriteLine();
+
+            using (var context = new CountriesContext())
             {
-                TV.DisplayTable(new[] { new { query.CountryName, query.Area } });
+                var continents = context.Continents
+                                        .Include(c => c.Countries) 
+                                        .ToList();
+
+                foreach (var continent in continents)
+                {
+                    Console.WriteLine(continent.ContinentName);
+
+                    var top3Countries = continent.Countries
+                                                 .OrderByDescending(c => c.Population)
+                                                 .Take(3)
+                                                 .Select(c => new { c.CountryName, c.Population })
+                                                 .ToList();
+
+                    if (top3Countries.Any())
+                    {
+                        Task2.OutputReport(top3Countries, outputChoice, $"{continent.ContinentName}_Top3MaxPopulation.txt");
+                    }
+                    else
+                    {
+                        WindowsHandler.AddInfoWindow(new[] { $"В континенте '{continent.ContinentName}' нет данных." });
+                    }
+                }
             }
         }
-    }
 
-    public void ShowAverageAreaOfEuropeanCountries()
-    {
-        using (var context = new CountriesContext())
+
+        // Показать среднее количество жителей в конкретной стране
+        public void ShowAveragePopulationInCountry()
         {
-            var averageArea = context.Countries
-                        .Where(c => c.IdContinentNavigation.ContinentName == "Europe")
-                        .Average(c => c.Area);
-            TV.DisplayTable(new[] { new { AverageArea = averageArea } });
-        }
-    }
+            Console.WriteLine("Введите название страны:");
+            string countryName = Console.ReadLine();
+            Console.WriteLine("Выберите вывод на экран (E) или в файл (F):");
+            char outputChoice = char.ToUpper(Console.ReadKey().KeyChar);
 
-    public void ShowTop3CitiesByPopulationInCountry()
-    {
-        Console.WriteLine("Введите название страны:");
-        string countryName = Console.ReadLine();
-
-        using (var context = new CountriesContext())
-        {
-            var query = context.Cities
-                        .Where(c => c.IdCountryNavigation.CountryName == countryName)
-                        .OrderByDescending(c => c.CityPopulation)
-                        .Take(3)
-                        .Select(c => new { c.CityName, c.CityPopulation });
-
-            TV.DisplayTable(query);
-        }
-    }
-
-    public void ShowTotalNumberOfCountries()
-    {
-        using (var context = new CountriesContext())
-        {
-            var count = context.Countries.Count();
-            TV.DisplayTable(new[] { new { TotalCountries = count } });
-        }
-    }
-
-    public void ShowContinentWithMaxCountries()
-    {
-        using (var context = new CountriesContext())
-        {
-            var query = context.Countries
-                        .GroupBy(c => c.IdContinentNavigation.ContinentName)
-                        .OrderByDescending(g => g.Count())
-                        .Select(g => new { Continent = g.Key, CountryCount = g.Count() })
-                        .FirstOrDefault();
-
-            if (query != null)
+            using (var context = new CountriesContext())
             {
-                TV.DisplayTable(new[] { query });
+                var averagePopulation = context.Cities
+                                               .Where(c => c.IdCountryNavigation.CountryName == countryName)
+                                               .Average(c => (double?)c.CityPopulation) ?? 0;
+
+                Task2.OutputReport(new[] { new { CountryName = countryName, AveragePopulation = averagePopulation } },
+                             outputChoice, $"{countryName}_AveragePopulation.txt");
             }
         }
-    }
 
-    public void ShowNumberOfCountriesPerContinent()
-    {
-        using (var context = new CountriesContext())
+        // Показать город с наименьшим количеством жителей в конкретной стране
+        public void ShowSmallestCityByPopulationInCountry()
         {
-            var query = context.Countries
-                        .GroupBy(c => c.IdContinentNavigation.ContinentName)
-                        .Select(g => new { Continent = g.Key, CountryCount = g.Count() });
+            Console.WriteLine("Введите название страны:");
+            string countryName = Console.ReadLine();
+            Console.WriteLine("Выберите вывод на экран (E) или в файл (F):");
+            char outputChoice = char.ToUpper(Console.ReadKey().KeyChar);
 
-            TV.DisplayTable(query);
+            using (var context = new CountriesContext())
+            {
+                var city = context.Cities
+                                  .Where(c => c.IdCountryNavigation.CountryName == countryName)
+                                  .OrderBy(c => c.CityPopulation)
+                                  .Select(c => new { c.CityName, c.CityPopulation })
+                                  .FirstOrDefault();
+
+                if (city != null)
+                {
+                    Task2.OutputReport(new[] { city }, outputChoice, $"{countryName}_SmallestCity.txt");
+                }
+                else
+                {
+                    WindowsHandler.AddInfoWindow([$"Для страны '{countryName}' не найдено городов."]);
+                }
+            }
+        }
+
+        public enum ProgramOptions
+        {
+            ShowTop3CountriesByContinentMinPopulation,
+            ShowTop3CountriesByContinentMaxPopulation,
+            ShowAveragePopulationInCountry,
+            ShowSmallestCityByPopulationInCountry,
+            Back,
+            CountOptions
         }
     }
-
-    public enum ProgramOptions
-    {
-        ShowTop5CountriesByArea,
-        ShowTop5CapitalsByPopulation,
-        ShowLargestCountryByArea,
-        ShowLargestCapitalByPopulation,
-        ShowSmallestCountryInEuropeByArea,
-        ShowAverageAreaOfEuropeanCountries,
-        ShowTop3CitiesByPopulationInCountry,
-        ShowTotalNumberOfCountries,
-        ShowContinentWithMaxCountries,
-        ShowNumberOfCountriesPerContinent,
-        Back,
-        CountOptions
-    }
-
 }

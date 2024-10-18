@@ -1,12 +1,15 @@
-﻿using ConsoleWinApp.UI;
-using ConsoleWinTasks;
+﻿
+using ConsoleWinApp.UI;
 using QuizTop;
 using QuizTop.UI;
+using System.Diagnostics;
+
+namespace ConsoleWinTasks.UI.Win.ApplicationWin;
 
 public class Task2 : IWin
 {
     #region DefaultPart
-    public WindowDisplay windowDisplay = new("Task 1: Show Data", typeof(ProgramOptions));
+    public WindowDisplay windowDisplay = new("Task 2: Reports System", typeof(ProgramOptions));
 
     public WindowDisplay WindowDisplay
     {
@@ -34,37 +37,24 @@ public class Task2 : IWin
     private void HandleMenuOption()
     {
         Console.Clear();
-        PointDB db = Application.dB;
 
         Console.CursorTop = SizeY;
         switch ((ProgramOptions)windowDisplay.CursorPosition)
         {
-            case ProgramOptions.ShowAllCountry:
-                ShowAllCountry();   
+            case ProgramOptions.ShowFullCountryInfo:
+                ShowFullCountryInfo();
                 break;
 
-            case ProgramOptions.ShowCountryNames:
-                ShowCountryNames();
+            case ProgramOptions.ShowPartialCountryInfo:
+                ShowPartialCountryInfo();
                 break;
 
-            case ProgramOptions.ShowCapitalNames:
-                ShowCapitalNames();
+            case ProgramOptions.ShowSpecificCountryInfo:
+                ShowSpecificCountryInfo();
                 break;
 
-            case ProgramOptions.ShowCitiesForCountry:
-                ShowCitiesForCountry();
-                break;
-
-            case ProgramOptions.ShowCapitalsWithPopulationOver5M:
-                ShowCapitalsWithPopulationOver5M();
-                break;
-
-            case ProgramOptions.ShowEuropeanCountries:
-                ShowEuropeanCountries();
-                break;
-
-            case ProgramOptions.ShowCountriesByArea:
-                ShowCountriesByArea();
+            case ProgramOptions.ShowCitiesOfSpecificCountry:
+                ShowCitiesOfSpecificCountry();
                 break;
 
             case ProgramOptions.Back:
@@ -73,134 +63,138 @@ public class Task2 : IWin
         }
     }
 
-    // 1. Отобразить всю информацию о странах
-    public void ShowAllCountry()
+    public void ShowFullCountryInfo()
     {
-        using (var context = new CountriesContext())
-        {
-            var query = from country in context.Countries
-                        join continent in context.Continents
-                            on country.IdContinent equals continent.Id
-                        join capitalCity in context.Cities
-                            on country.IdCapitalCity equals capitalCity.Id into capitalJoin
-                        from capital in capitalJoin.DefaultIfEmpty()
-                        select new
-                        {
-                            country.CountryName,
-                            country.CapitalName,
-                            country.Population,
-                            country.Area,
-                            continent.ContinentName,
-                            CapitalCityName = capital.CityName ?? "Столица отсутствует",
-                            CapitalPopulation = capital != null ? capital.CityPopulation : 0
-                        };
-
-            TV.DisplayTable(query);
-        }
-    }
-
-    // 2. Отобразить названия стран
-    public void ShowCountryNames()
-    {
-        using (var context = new CountriesContext())
-        {
-            var query = from country in context.Countries
-                        select new { country.CountryName };
-
-            TV.DisplayTable(query);
-        }
-    }
-
-    // 3. Отобразить названия столиц
-    public void ShowCapitalNames()
-    {
-        using (var context = new CountriesContext())
-        {
-            var query = from country in context.Countries
-                        select new { country.CapitalName };
-
-            TV.DisplayTable(query);
-        }
-    }
-
-    // 4. Отобразить названия крупных городов конкретной страны
-    public void ShowCitiesForCountry()
-    {
-        Console.WriteLine("Введите название страны:");
-        var countryName = Console.ReadLine();
+        Console.Write("Выберите вывод на экран (E) или в файл (F):");
+        char outputChoice = char.ToUpper(Console.ReadKey().KeyChar);
+        Console.WriteLine();
 
         using (var context = new CountriesContext())
         {
-            var query = from country in context.Countries
-                        join city in context.Cities
-                            on country.Id equals city.IdCountry
-                        where country.CountryName == countryName
-                        select new { city.CityName };
+            var countries = context.Countries
+                                   .Select(c => new { c.CountryName, c.Population, c.Area, c.CapitalName })
+                                   .ToList();
 
-            TV.DisplayTable(query);
+            OutputReport(countries, outputChoice, "FullCountryInfo.txt");
         }
     }
 
-    // 5. Отобразить названия столиц с количеством жителей больше пяти миллионов
-    public void ShowCapitalsWithPopulationOver5M()
+    public void ShowPartialCountryInfo()
     {
-        using (var context = new CountriesContext())
+        Console.Write("Введите количество полей для отображения (1 - только название, 2 - название и население, 3 - название, население и площадь):");
+        if (int.TryParse(Console.ReadLine(), out int fields))
         {
-            var query = from country in context.Countries
-                        join capitalCity in context.Cities
-                            on country.IdCapitalCity equals capitalCity.Id
-                        where capitalCity.CityPopulation > 5000000
-                        select new { capitalCity.CityName };
-
-            TV.DisplayTable(query);
-        }
-    }
-
-    // 6. Отобразить названия всех европейских стран
-    public void ShowEuropeanCountries()
-    {
-        using (var context = new CountriesContext())
-        {
-            var query = from country in context.Countries
-                        join continent in context.Continents
-                            on country.IdContinent equals continent.Id
-                        where continent.ContinentName == "Европа"
-                        select new { country.CountryName };
-
-            TV.DisplayTable(query);
-        }
-    }
-
-    // 7. Отобразить названия стран с площадью больше конкретного числа
-    public void ShowCountriesByArea()
-    {
-        Console.WriteLine("Введите минимальную площадь:");
-        if (decimal.TryParse(Console.ReadLine(), out var area))
-        {
+            Console.Write("Выберите вывод на экран (E) или в файл (F):");
+            char outputChoice = char.ToUpper(Console.ReadKey().KeyChar);
+            Console.WriteLine();
             using (var context = new CountriesContext())
             {
-                var query = from country in context.Countries
-                            where country.Area > area
-                            select new { country.CountryName };
+                IQueryable<dynamic> query;
+                switch (fields)
+                {
+                    case 1:
+                        query = context.Countries.Select(c => new { c.CountryName });
+                        break;
+                    case 2:
+                        query = context.Countries.Select(c => new { c.CountryName, c.Population });
+                        break;
+                    case 3:
+                        query = context.Countries.Select(c => new { c.CountryName, c.Population, c.Area });
+                        break;
+                    default:
+                        Console.WriteLine("Некорректное количество полей.");
+                        return;
+                }
 
-                TV.DisplayTable(query);
+                var countries = query.ToList();
+                OutputReport(countries, outputChoice, "PartialCountryInfo.txt");
             }
         }
         else
         {
-            WindowsHandler.AddInfoWindow(["Неверный ввод площади."]);
+            Console.WriteLine("Некорректный ввод.");
+        }
+    }
+
+    public void ShowSpecificCountryInfo()
+    {
+        Console.WriteLine("Введите название страны:");
+        string countryName = Console.ReadLine();
+
+        Console.WriteLine("Выберите вывод на экран (E) или в файл (F):");
+        char outputChoice = char.ToUpper(Console.ReadKey().KeyChar);
+
+        using (var context = new CountriesContext())
+        {
+            var country = context.Countries
+                                 .Where(c => c.CountryName == countryName)
+                                 .Select(c => new { c.CountryName, c.Population, c.Area, c.CapitalName })
+                                 .FirstOrDefault();
+
+            if (country != null)
+            {
+                OutputReport(new[] { country }, outputChoice, $"{countryName}_Info.txt");
+            }
+            else
+            {
+                Console.WriteLine($"Страна '{countryName}' не найдена.");
+            }
+        }
+    }
+
+    public void ShowCitiesOfSpecificCountry()
+    {
+        Console.WriteLine("Введите название страны:");
+        string countryName = Console.ReadLine();
+
+        Console.WriteLine("Выберите вывод на экран (E) или в файл (F):");
+        char outputChoice = char.ToUpper(Console.ReadKey().KeyChar);
+
+        using (var context = new CountriesContext())
+        {
+            var cities = context.Cities
+                                .Where(c => c.IdCountryNavigation.CountryName == countryName)
+                                .Select(c => new { c.CityName, c.CityPopulation })
+                                .ToList();
+
+            if (cities.Any())
+            {
+                OutputReport(cities, outputChoice, $"{countryName}_CitiesInfo.txt");
+            }
+            else
+            {
+                Console.WriteLine($"Для страны '{countryName}' не найдено городов.");
+            }
+        }
+    }
+
+    public static void OutputReport<T>(ICollection<T> data, char outputChoice, string fileName)
+    {
+        if (WindowTools.IsKeyFromArray(['E', 'Е', 'У', 'T'], Char.ToUpper(outputChoice)))
+        {
+            TV.DisplayTable(data);
+        }
+        else if (WindowTools.IsKeyFromArray(['F', 'А'], Char.ToUpper(outputChoice)))
+        {
+            using (StreamWriter writer = new(Application.PathData + "\\" + fileName))
+            {
+                TV.DisplayTable(data, writer);
+            }
+            Console.WriteLine($"Отчет сохранен в файл: {Application.PathData}\\{fileName}");
+            Process.Start("explorer.exe", Application.PathData);
+        }
+        else
+        {
+            Console.WriteLine("Некорректный выбор.");
         }
     }
 
     public enum ProgramOptions
     {
-        ShowAllCountry,
-        ShowCountryNames,
-        ShowCapitalNames,
-        ShowCitiesForCountry,
-        ShowCapitalsWithPopulationOver5M,
-        ShowEuropeanCountries,
-        ShowCountriesByArea,
+        ShowFullCountryInfo,
+        ShowPartialCountryInfo,
+        ShowSpecificCountryInfo,
+        ShowCitiesOfSpecificCountry,
         Back,
         CountOptions
     }

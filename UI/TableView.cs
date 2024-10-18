@@ -1,9 +1,10 @@
 ﻿using System.Data;
+using System.IO;
 
 namespace ConsoleWinApp.UI
 {
-    /// <summary>TableView</summary>
-    public static class TV 
+    /// <summary>TableView with output stream support</summary>
+    public static class TV
     {
         public static DataTable ConvertToDataTable<T>(ICollection<T> collection)
         {
@@ -30,21 +31,19 @@ namespace ConsoleWinApp.UI
 
             return dataTable;
         }
+
         public static DataTable ConvertToDataTable<T>(IQueryable<T> query)
         {
-            DataTable dataTable = new DataTable();
+            DataTable dataTable = new();
 
-            // Получаем тип элемента из запроса
             var firstItem = query.FirstOrDefault();
             if (firstItem != null)
             {
-                // Автоматическое создание колонок на основе свойств первого элемента
                 foreach (var prop in firstItem.GetType().GetProperties())
                 {
                     dataTable.Columns.Add(prop.Name, prop.PropertyType);
                 }
 
-                // Заполнение DataTable данными из запроса
                 foreach (var item in query.ToList())
                 {
                     var row = dataTable.NewRow();
@@ -58,16 +57,21 @@ namespace ConsoleWinApp.UI
 
             return dataTable;
         }
-        public static void DisplayTable<T>(IQueryable<T> query)
+
+        public static void DisplayTable<T>(IQueryable<T> query, TextWriter output = null)
         {
-            DisplayTable(ConvertToDataTable(query));
+            DisplayTable(ConvertToDataTable(query), output);
         }
-        public static void DisplayTable<T>(ICollection<T> query)
+
+        public static void DisplayTable<T>(ICollection<T> query, TextWriter output = null)
         {
-            DisplayTable(ConvertToDataTable(query));
+            DisplayTable(ConvertToDataTable(query), output);
         }
-        public static void DisplayTable(DataTable table)
+
+        public static void DisplayTable(DataTable table, TextWriter output = null)
         {
+            output ??= Console.Out;
+
             int[] maxLengths = new int[table.Columns.Count];
 
             for (int i = 0; i < table.Columns.Count; i++)
@@ -87,21 +91,21 @@ namespace ConsoleWinApp.UI
             {
                 for (int i = 0; i < table.Columns.Count; i++)
                 {
-                    Console.Write("+");
-                    Console.Write(new string('-', maxLengths[i] + 2)); // +2 для пробелов между значениями
+                    output.Write("+");
+                    output.Write(new string('-', maxLengths[i] + 2));
                 }
-                Console.WriteLine("+");
+                output.WriteLine("+");
             }
 
             PrintLine();
 
             for (int i = 0; i < table.Columns.Count; i++)
             {
-                Console.Write("| ");
-                Console.Write(table.Columns[i].ColumnName.PadRight(maxLengths[i]));
-                Console.Write(" ");
+                output.Write("| ");
+                output.Write(table.Columns[i].ColumnName.PadRight(maxLengths[i]));
+                output.Write(" ");
             }
-            Console.WriteLine("|");
+            output.WriteLine("|");
 
             PrintLine();
 
@@ -109,11 +113,11 @@ namespace ConsoleWinApp.UI
             {
                 for (int i = 0; i < table.Columns.Count; i++)
                 {
-                    Console.Write("| ");
-                    Console.Write(row[i].ToString().PadRight(maxLengths[i]));
-                    Console.Write(" ");
+                    output.Write("| ");
+                    output.Write(row[i].ToString().PadRight(maxLengths[i]));
+                    output.Write(" ");
                 }
-                Console.WriteLine("|");
+                output.WriteLine("|");
                 PrintLine();
             }
         }
