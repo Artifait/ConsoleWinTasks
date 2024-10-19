@@ -2,13 +2,13 @@
 using System.Runtime.CompilerServices;
 using System.Text;
 
-namespace ConsoleWinTasks.UI;
+namespace ConsoleWinTasks.UI.ConsoleFrameWork;
 
 public static class MatrixFormater
 {
     public static string[] GetWindowMatrix(string[] strings, string title)
     {
-        int count = Math.Max(MatrixFormater.GetMaxLength(strings), title.Length) + (title.Length % 2 == 0 ? 5 : 4);
+        int count = Math.Max(GetMaxLength(strings), title.Length) + (title.Length % 2 == 0 ? 5 : 4);
         string[] windowMatrix = new string[strings.Length + 6];
         windowMatrix[0] = "+" + new string('-', count) + "+";
         windowMatrix[1] = "| " + new string(' ', count - 2) + " |";
@@ -23,7 +23,7 @@ public static class MatrixFormater
 
     public static string[] GetNumberedWindowMatrix(string title, string[] strings)
     {
-        int count = Math.Max(MatrixFormater.GetMaxLength(strings), title.Length) + (title.Length % 2 == 0 ? 6 : 7);
+        int count = Math.Max(GetMaxLength(strings), title.Length) + (title.Length % 2 == 0 ? 6 : 7);
         string[] numberedWindowMatrix = new string[strings.Length + 5];
         numberedWindowMatrix[0] = "+" + new string('-', count) + "+";
         numberedWindowMatrix[1] = "| " + title.PadCenter(count - 2) + " |";
@@ -34,7 +34,7 @@ public static class MatrixFormater
             int index2 = index1 + 3;
             DefaultInterpolatedStringHandler interpolatedStringHandler = new DefaultInterpolatedStringHandler(5, 1);
             interpolatedStringHandler.AppendLiteral("|  ");
-            interpolatedStringHandler.AppendFormatted<int>(index1 + 1);
+            interpolatedStringHandler.AppendFormatted(index1 + 1);
             interpolatedStringHandler.AppendLiteral(") ");
             string str = interpolatedStringHandler.ToStringAndClear() + strings[index1].PadRight(count - 6) + " |";
             strArray[index2] = str;
@@ -51,8 +51,8 @@ public static class MatrixFormater
         int num3 = num2 + (num2 == 0 ? 2 : 1) * (options == null || options.Length == 0 ? 0 : 1);
         if (num3 == 0)
             num3 = 1;
-        int length = num3 + (2 + (options == null ? 0 : options.Length) + (fields == null ? 0 : fields.Count));
-        int num4 = Math.Max(Math.Max(options == null || options.Length == 0 ? 0 : MatrixFormater.GetMaxLength(options), string.IsNullOrEmpty(title) ? 0 : title.Length), fields == null || fields.Count == 0 ? 0 : MatrixFormater.GetMaxLength(fields));
+        int length = num3 + 2 + (options == null ? 0 : options.Length) + (fields == null ? 0 : fields.Count);
+        int num4 = Math.Max(Math.Max(options == null || options.Length == 0 ? 0 : GetMaxLength(options), string.IsNullOrEmpty(title) ? 0 : title.Length), fields == null || fields.Count == 0 ? 0 : GetMaxLength(fields));
         int num5 = num4;
         int num6 = string.IsNullOrEmpty(title) ? num5 + (num4 % 2 == 0 ? 6 : 7) : num5 + (title.Length % 2 == 0 ? 6 : 7);
         string[] windowMatrix = new string[length];
@@ -82,7 +82,7 @@ public static class MatrixFormater
         if (fields != null && fields.Count != 0)
         {
             for (int index5 = 0; index5 < fields.Count; ++index5)
-                windowMatrix[num9++] = ("|  " + fields.ElementAt<KeyValuePair<string, string>>(index5).Key + ": " + fields.ElementAt<KeyValuePair<string, string>>(index5).Value).PadRight(num6) + " |";
+                windowMatrix[num9++] = ("|  " + fields.ElementAt(index5).Key + ": " + fields.ElementAt(index5).Value).PadRight(num6) + " |";
             windowMatrix[num9++] = "| " + new string(' ', num6 - 2) + " |";
         }
         string[] strArray4 = windowMatrix;
@@ -93,7 +93,7 @@ public static class MatrixFormater
         return windowMatrix;
     }
 
-    public static string[] GetNumberedWindowMatrix(string title,string[] strings, Dictionary<string, string> fields)
+    public static string[] GetNumberedWindowMatrix(string title, string[] strings, Dictionary<string, string> fields)
     {
         if (fields.Count == 0 || fields == null)
             return GetNumberedWindowMatrix(title, strings);
@@ -108,7 +108,7 @@ public static class MatrixFormater
             int index2 = index1 + 3;
             DefaultInterpolatedStringHandler interpolatedStringHandler = new DefaultInterpolatedStringHandler(5, 1);
             interpolatedStringHandler.AppendLiteral("|  ");
-            interpolatedStringHandler.AppendFormatted<int>(index1 + 1);
+            interpolatedStringHandler.AppendFormatted(index1 + 1);
             interpolatedStringHandler.AppendLiteral(") ");
             string str = interpolatedStringHandler.ToStringAndClear() + strings[index1].PadRight(num1 - 6) + " |";
             strArray[index2] = str;
@@ -119,9 +119,9 @@ public static class MatrixFormater
         {
             string[] strArray = numberedWindowMatrix;
             int index4 = num2 + index3;
-            KeyValuePair<string, string> keyValuePair = fields.ElementAt<KeyValuePair<string, string>>(index3);
+            KeyValuePair<string, string> keyValuePair = fields.ElementAt(index3);
             string key = keyValuePair.Key;
-            keyValuePair = fields.ElementAt<KeyValuePair<string, string>>(index3);
+            keyValuePair = fields.ElementAt(index3);
             string str1 = keyValuePair.Value;
             string str2 = ("|  " + key + ": " + str1).PadRight(num1) + " |";
             strArray[index4] = str2;
@@ -132,7 +132,7 @@ public static class MatrixFormater
     }
 
     public static char[,] GetWindowMatrixChar(string[] strings, string title) => StringToCharArrayMatrix(GetWindowMatrix(strings, title));
-    public static char[,] GetWindowMatrixChar(string? title,string[]? options, Dictionary<string, string>? fields, bool numberedOptions = true) => StringToCharArrayMatrix(GetWindowMatrix(title, options, fields));
+    public static char[,] GetWindowMatrixChar(string? title, string[]? options, Dictionary<string, string>? fields, bool numberedOptions = true) => StringToCharArrayMatrix(GetWindowMatrix(title, options, fields));
 
     public static string[] GetQuestionMatrix(string[] strings)
     {

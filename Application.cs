@@ -1,5 +1,4 @@
-﻿
-using ConsoleWinTasks.UI;
+﻿using ConsoleWinTasks.UI.ConsoleFrameWork;
 using Microsoft.EntityFrameworkCore;
 
 namespace ConsoleWinTasks;
@@ -20,7 +19,6 @@ public static class Application
 
         db = new GameContext();
         db.Database.EnsureCreated();
-        db.Database.Migrate();
     }
 
     public static void Run()

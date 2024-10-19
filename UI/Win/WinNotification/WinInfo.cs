@@ -1,4 +1,6 @@
 ﻿
+using ConsoleWinTasks.UI.ConsoleFrameWork;
+
 namespace ConsoleWinTasks.UI.Win.WinNotification
 {
     public class WinInfo : IWin

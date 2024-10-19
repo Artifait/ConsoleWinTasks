@@ -1,7 +1,7 @@
 ﻿
 using System.Data;
 
-namespace ConsoleWinTasks.UI;
+namespace ConsoleWinTasks.UI.ConsoleFrameWork;
 
 /// <summary>TableView</summary>
 public static class TV
@@ -58,7 +58,7 @@ public static class TV
             for (int i = 0; i < table.Columns.Count; i++)
             {
                 Console.Write("+");
-                Console.Write(new string('-', maxLengths[i] + 2)); 
+                Console.Write(new string('-', maxLengths[i] + 2));
             }
             Console.WriteLine("+");
         }

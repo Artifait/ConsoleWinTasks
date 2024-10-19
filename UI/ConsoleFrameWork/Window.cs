@@ -1,5 +1,4 @@
-﻿
-namespace ConsoleWinTasks.UI;
+﻿namespace ConsoleWinTasks.UI.ConsoleFrameWork;
 
 public class WindowDisplay
 {
@@ -16,7 +15,8 @@ public class WindowDisplay
     public bool CursorVisibility
     {
         get => _CursorVisibility;
-        set {
+        set
+        {
             if (!value) UpdateCanvas();
             _CursorVisibility = value;
         }
@@ -41,7 +41,8 @@ public class WindowDisplay
     public string? Title
     {
         get => _Title;
-        set {
+        set
+        {
             _Title = value;
             NeedUpdateCanvas = true;
         }
@@ -50,7 +51,8 @@ public class WindowDisplay
     public List<string> Options
     {
         get => _Strings;
-        set {
+        set
+        {
             _Strings = value;
             NeedUpdateCanvas = true;
         }
@@ -59,7 +61,8 @@ public class WindowDisplay
     public Dictionary<string, string> Fields
     {
         get => _Fields;
-        set {
+        set
+        {
             _Fields = value;
             NeedUpdateCanvas = true;
         }
@@ -68,11 +71,12 @@ public class WindowDisplay
     public int CursorPosition
     {
         get => _CursorPosition;
-        set {
+        set
+        {
             if (Options != null && Options.Count != 0 && CursorVisibility)
                 CanvasWindow[_CursorPosition + IndexStartCursorPosition, 2] = ' ';
             _CursorPosition = value;
-            if (Options == null || Options.Count == 0 || !this.CursorVisibility)
+            if (Options == null || Options.Count == 0 || !CursorVisibility)
                 return;
             CanvasWindow[_CursorPosition + IndexStartCursorPosition, 2] = CursorChar;
         }
@@ -101,7 +105,7 @@ public class WindowDisplay
     {
         Array values = Enum.GetValues(options);
 
-        for (int index = 0; index < values.Length - 1; ++index)
+        for (int index = 0; index < values.Length; ++index)
             Options.Add(Enum.GetName(options, index));
 
         Title = title;
@@ -114,15 +118,20 @@ public class WindowDisplay
         WindowList = displays;
     }
 
-    public WindowDisplay(string title, Type options, Type fields)
+    public WindowDisplay(string title, Type? options, Type? fields)
     {
-        Array values1 = Enum.GetValues(options);
-        Array values2 = Enum.GetValues(fields);
-
-        for (int index = 0; index < values1.Length - 1; ++index)
-            Options.Add(Enum.GetName(options, index));
-        for (int index = 0; index < values2.Length; ++index)
-            Fields[Enum.GetName(fields, index)] = "";
+        if (options != null)
+        {
+            Array values1 = Enum.GetValues(options);
+            for (int index = 0; index < values1.Length; ++index)
+                Options.Add(Enum.GetName(options, index));
+        }
+        if (fields != null)
+        {
+            Array values2 = Enum.GetValues(fields);
+            for (int index = 0; index < values2.Length; ++index)
+                Fields[Enum.GetName(fields, index)] = "";
+        }
 
         Title = title;
         CanvasWindow = MatrixFormater.GetWindowMatrixChar(Title, Options.ToArray(), Fields);
@@ -160,7 +169,7 @@ public class WindowDisplay
         if (!IsMain) return;
         MaxLeft = Math.Max(CanvasWindow.GetLength(1), WindowList.Count != 0 ? WindowList.Max(x => x.CanvasWindow.GetLength(1)) : 0);
         MaxTop = Console.CursorTop + 2;
-        if(showInput)
+        if (showInput)
             Console.Write("UserInput: ");
 
     }

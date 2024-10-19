@@ -1,0 +1,54 @@
+﻿<#@ template language="C#" debug="false" hostspecific="true" #>
+<#@ output extension=".cs" #>
+<#@ import namespace="System.IO" #>
+<#@ import namespace="System" #>
+
+<#
+    // <Конфиг>
+    int TaskNumber = 3;
+    var Methods = new string[] { "CreateGame", "UpdateGame", "DeleteGame"};
+    //</Конфиг>
+
+    string fileName = $"CwTask{TaskNumber}.cs";
+
+    string outputFilePath = Path.Combine(".", "GeneratedFileName.txt");
+    File.WriteAllText(outputFilePath, fileName);
+#>
+
+using ConsoleWinTasks.UI.Win.WinTemplate;
+
+namespace ConsoleWinTasks.UI.Win.ApplicationWin
+{
+    public class CwTask<#= TaskNumber #> : CwTask
+    {
+        public override Type? ProgramOptionsType => typeof(ProgramOptions);
+
+        public enum ProgramOptions 
+        { 
+            Back,
+<# foreach (var method in Methods) { #>
+            <#= method #>,
+<# } #>
+        }
+
+        public CwTask<#= TaskNumber #>() : base(nameof(CwTask<#= TaskNumber #>))
+        {
+            MenuHandlers = new()
+            {
+                { (int)ProgramOptions.Back, BackHandler },
+<# foreach (var method in Methods) { #>
+                { (int)ProgramOptions.<#= method #>, <#= method #>Handler },
+<# } #>
+            };
+        }
+
+        #region Logic
+<# foreach (var method in Methods) { #>
+        private void <#= method #>Handler()
+        {
+            // Логика для <#= method #>
+        }
+<# } #>
+        #endregion
+    }
+}
