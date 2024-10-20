@@ -14,7 +14,7 @@ public static class Application
     private static void Init()
     {
         Console.Title = "Tasks";
-        Console.SetWindowSize(80, 40);
+        Console.SetWindowSize(140, 50);
         WinStack.Push(WindowsHandler.GetWindow<UI.Win.ApplicationWin.WinStart>());
 
         db = new GameContext();

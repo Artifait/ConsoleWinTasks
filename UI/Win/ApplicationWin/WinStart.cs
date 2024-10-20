@@ -13,7 +13,7 @@ namespace ConsoleWinTasks.UI.Win.ApplicationWin
             {
                 { (int)ProgramOptions.CwTask1 , WindowsHandler.AddWindow<CwTask1>},
                 { (int)ProgramOptions.CwTask2 , WindowsHandler.AddWindow<CwTask2>},
-                //{ (int)ProgramOptions.CwTask3 , WindowsHandler.AddWindow<CwTask3>},
+                { (int)ProgramOptions.CwTask3 , WindowsHandler.AddWindow<CwTask3>},
                 { (int)ProgramOptions.Back , BackHandler },
             };
         }

@@ -16,7 +16,11 @@ namespace ConsoleWinTasks.UI.Win.ApplicationWin
             ShowBottom3SellingGames,
             Back
         }
-
+        public override void HandleMenuOption()
+        {
+            Console.Clear();
+            base.HandleMenuOption();
+        }
         public CwTask2() : base(nameof(CwTask2))
         {
             MenuHandlers = new()

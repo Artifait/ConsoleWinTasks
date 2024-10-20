@@ -11,6 +11,7 @@ namespace ConsoleWinTasks.UI.ConsoleFrameWork
     /// </summary>
     public class IND
     {
+        /// <summary> в Родительном Падеже</summary>
         public static DateOnly InputDateTime(string TitleDate)
         {
             Console.WriteLine("Введите Дату " + TitleDate + ":\n");
