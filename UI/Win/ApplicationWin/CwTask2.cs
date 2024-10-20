@@ -6,93 +6,140 @@ namespace ConsoleWinTasks.UI.Win.ApplicationWin
     public class CwTask2 : CwTask
     {
         public override Type? ProgramOptionsType => typeof(ProgramOptions);
+        private GameContext db;
+
         public enum ProgramOptions
         {
-            ShowSinglePlayerGame,
-            ShowMultiplayerPlayerGame,
-            ShowTopSellingGame,
-            ShowLowestSellingGame,
-            ShowTop3SellingGames,
-            ShowBottom3SellingGames,
-            Back
+            Back,
+            DisplaySinglePlayerGameCount,
+            DisplayMultiPlayerGameCount,
+            ShowGameWithMaxSalesByStyle,
+            DisplayTop5BestSellingGamesByStyle,
+            DisplayTop5WorstSellingGamesByStyle,
+            DisplayGameFullInfo,
+            DisplayStudioNameAndTopStyleByGameCount,
         }
-        public override void HandleMenuOption()
-        {
-            Console.Clear();
-            base.HandleMenuOption();
-        }
+
         public CwTask2() : base(nameof(CwTask2))
         {
             MenuHandlers = new()
             {
-                { (int)ProgramOptions.Back , BackHandler },
-                { (int)ProgramOptions.ShowSinglePlayerGame , ShowSinglePlayerGame },
-                { (int)ProgramOptions.ShowMultiplayerPlayerGame , ShowMultiplayerPlayerGame },
-                { (int)ProgramOptions.ShowTopSellingGame, ShowTopSellingGame },
-                { (int)ProgramOptions.ShowLowestSellingGame, ShowLowestSellingGame },
-                { (int)ProgramOptions.ShowTop3SellingGames, ShowTop3SellingGames },
-                { (int)ProgramOptions.ShowBottom3SellingGames, ShowBottom3SellingGames }
+                { (int)ProgramOptions.Back, BackHandler },
+                { (int)ProgramOptions.DisplaySinglePlayerGameCount, DisplaySinglePlayerGameCountHandler },
+                { (int)ProgramOptions.DisplayMultiPlayerGameCount, DisplayMultiPlayerGameCountHandler },
+                { (int)ProgramOptions.ShowGameWithMaxSalesByStyle, ShowGameWithMaxSalesByStyleHandler },
+                { (int)ProgramOptions.DisplayTop5BestSellingGamesByStyle, DisplayTop5BestSellingGamesByStyleHandler },
+                { (int)ProgramOptions.DisplayTop5WorstSellingGamesByStyle, DisplayTop5WorstSellingGamesByStyleHandler },
+                { (int)ProgramOptions.DisplayGameFullInfo, DisplayGameFullInfoHandler },
+                { (int)ProgramOptions.DisplayStudioNameAndTopStyleByGameCount, DisplayStudioNameAndTopStyleByGameCountHandler },
             };
+            db = (GameContext)Application.db;
         }
 
         #region Logic
-
-        public void ShowSinglePlayerGame()
+        private void DisplaySinglePlayerGameCountHandler()
         {
-            var res = ((GameContext)Application.db).Games
-                .Where(g => g.GameMode.Contains("Single-player"))
-                .ToList();
-
-            TV.DisplayTable(res);
+            var count = db.Games.Count(g => g.GameMode == "SinglePlayer");
+            TV.DisplayTable(new List<int> { count });
         }
 
-        public void ShowMultiplayerPlayerGame()
+        private void DisplayMultiPlayerGameCountHandler()
         {
-            var res = ((GameContext)Application.db).Games
-                .Where(g => g.GameMode.Contains("Multiplayer"))
-                .ToList();
-
-            TV.DisplayTable(res);
+            var count = db.Games.Count(g => g.GameMode == "MultiPlayer");
+            TV.DisplayTable(new List<int> { count });
         }
 
-        public void ShowTopSellingGame()
+        private void ShowGameWithMaxSalesByStyleHandler()
         {
-            var topGame = ((GameContext)Application.db).Games
-                .OrderByDescending(g => g.CopiesSold)
-                .FirstOrDefault();
+            Console.Write("Введите стиль игры: ");
+            var style = Console.ReadLine();
+            var game = db.Games
+                         .Where(g => g.StuleGame == style)
+                         .OrderByDescending(g => g.CopiesSold)
+                         .FirstOrDefault();
 
-            TV.DisplayTable(new List<Game> { topGame });
+            if (game != null)
+            {
+                TV.DisplayTable(new List<Game> { game });
+            }
+            else
+            {
+                Console.WriteLine("Игра с данным стилем не найдена.");
+            }
         }
 
-        public void ShowLowestSellingGame()
+        private void DisplayTop5BestSellingGamesByStyleHandler()
         {
-            var lowestGame = ((GameContext)Application.db).Games
-                .OrderBy(g => g.CopiesSold)
-                .FirstOrDefault();
+            Console.Write("Введите стиль игры: ");
+            var style = Console.ReadLine();
+            var games = db.Games
+                          .Where(g => g.StuleGame == style)
+                          .OrderByDescending(g => g.CopiesSold)
+                          .Take(5)
+                          .ToList();
 
-            TV.DisplayTable(new List<Game> { lowestGame });
+            TV.DisplayTable(games);
         }
 
-        public void ShowTop3SellingGames()
+        private void DisplayTop5WorstSellingGamesByStyleHandler()
         {
-            var top3Games = ((GameContext)Application.db).Games
-                .OrderByDescending(g => g.CopiesSold)
-                .Take(3)
-                .ToList();
+            Console.Write("Введите стиль игры: ");
+            var style = Console.ReadLine();
+            var games = db.Games
+                          .Where(g => g.StuleGame == style)
+                          .OrderBy(g => g.CopiesSold)
+                          .Take(5)
+                          .ToList();
 
-            TV.DisplayTable(top3Games);
+            TV.DisplayTable(games);
         }
 
-        public void ShowBottom3SellingGames()
+        private void DisplayGameFullInfoHandler()
         {
-            var bottom3Games = ((GameContext)Application.db).Games
-                .OrderBy(g => g.CopiesSold)
-                .Take(3)
-                .ToList();
+            Console.Write("Введите ID игры: ");
+            if (int.TryParse(Console.ReadLine(), out int gameId))
+            {
+                var game = db.Games
+                             .Where(g => g.Id == gameId)
+                             .Select(g => new
+                             {
+                                 g.Id,
+                                 g.Name,
+                                 g.StuleGame,
+                                 StudioName = g.Studio.Name,
+                                 g.ReleaseDate,
+                                 g.GameMode,
+                                 g.CopiesSold
+                             })
+                             .FirstOrDefault();
 
-            TV.DisplayTable(bottom3Games);
+                if (game != null)
+                {
+                    TV.DisplayTable(new List<object> { game });
+                }
+                else
+                {
+                    Console.WriteLine("Игра с данным ID не найдена.");
+                }
+            }
         }
 
+        private void DisplayStudioNameAndTopStyleByGameCountHandler()
+        {
+            var result = db.Studios
+                           .Select(s => new
+                           {
+                               StudioName = s.Name,
+                               TopStyle = s.Games
+                                           .GroupBy(g => g.StuleGame)
+                                           .OrderByDescending(g => g.Count())
+                                           .Select(g => g.Key)
+                                           .FirstOrDefault()
+                           })
+                           .ToList();
+
+            TV.DisplayTable(result);
+        }
         #endregion
     }
 }

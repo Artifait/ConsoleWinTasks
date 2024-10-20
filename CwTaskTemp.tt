@@ -5,8 +5,17 @@
 
 <#
     // <Конфиг>
-    int TaskNumber = 3;
-    var Methods = new string[] { "CreateGame", "UpdateGame", "DeleteGame"};
+    int TaskNumber = 1;
+    var Methods = new string[] 
+    {
+        "DisplaySinglePlayerGameCount",           
+        "DisplayMultiPlayerGameCount",                 
+        "ShowGameWithMaxSalesByStyle",                
+        "DisplayTop5BestSellingGamesByStyle",        
+        "DisplayTop5WorstSellingGamesByStyle",         
+        "DisplayGameFullInfo",                       
+        "DisplayStudioNameAndTopStyleByGameCount"     
+    };
     //</Конфиг>
 
     string fileName = $"CwTask{TaskNumber}.cs";
@@ -46,7 +55,7 @@ namespace ConsoleWinTasks.UI.Win.ApplicationWin
 <# foreach (var method in Methods) { #>
         private void <#= method #>Handler()
         {
-            // Логика для <#= method #>
+            
         }
 <# } #>
         #endregion
