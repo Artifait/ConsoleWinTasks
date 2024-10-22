@@ -5,6 +5,10 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+
+    <!-- Определение имени шаблона как переменной -->
+	  <TempName>CwTaskTemp</TempName>
+	  <FilesPath>UI\Win\ApplicationWin</FilesPath>
   </PropertyGroup>
 
   <ItemGroup>
@@ -19,5 +23,71 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
   </ItemGroup>
+
+
+	<!-- Описание генерации для CwTask.cs через T4 -->
+	<ItemGroup>
+		<None Update="$(TempName).tt">
+			<Generator>TextTemplatingFileGenerator</Generator>
+			<LastGenOutput>$(TempName).cs</LastGenOutput>
+		</None>
+	</ItemGroup>
+
+	<ItemGroup>
+		<Compile Update="$(TempName).cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>$(TempName).tt</DependentUpon>
+		</Compile>
+	</ItemGroup>
+
+	<ItemGroup>
+		<Folder Include="$(FilesPath)\" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
+	</ItemGroup>
+
+	<!-- Target для проверки и перемещения файла в подпапку FilesPath -->
+	<Target Name="MoveCwTaskFile" AfterTargets="AfterCompile">
+		<!-- Чтение содержимого файла GeneratedFileName.txt -->
+		<ReadLinesFromFile File="GeneratedFileName.txt">
+			<Output TaskParameter="Lines" ItemName="GeneratedFileName" />
+		</ReadLinesFromFile>
+
+		<!-- Определяем полный путь для нового файла -->
+		<PropertyGroup>
+			<NewFilePath>$(FilesPath)\@(GeneratedFileName)</NewFilePath>
+		</PropertyGroup>
+
+		<!-- Проверяем существование файла в папке FilesPath -->
+		<ItemGroup>
+			<ExistingFileInPath Include="$(NewFilePath)" Condition="Exists('$(NewFilePath)')" />
+		</ItemGroup>
+
+		<!-- Если файл с новым именем уже существует в папке, удаляем $(TempName).cs -->
+		<Message Condition="@(ExistingFileInPath-&gt;Count()) &gt; 0" Text="Файл с именем @(GeneratedFileName) уже существует в папке $(FilesPath). Удаляем $(TempName).cs для предотвращения конфликта." Importance="high" />
+		<Delete Files="$(TempName).cs" Condition="@(ExistingFileInPath-&gt;Count()) &gt; 0" />
+
+		<!-- Если файл с новым именем не существует, переименовываем и перемещаем файл -->
+		<Move Condition="Exists('$(TempName).cs') AND @(ExistingFileInPath-&gt;Count()) == 0" SourceFiles="$(TempName).cs" DestinationFiles="$(NewFilePath)">
+			<Output TaskParameter="MovedFiles" ItemName="RenamedFile" />
+		</Move>
+
+		<!-- Добавляем новый файл в проект, если он был переименован и перемещен -->
+		<ItemGroup Condition="@(RenamedFile-&gt;Count()) &gt; 0">
+			<Compile Include="@(RenamedFile)" />
+			<Compile Remove="$(TempName).cs" />
+		</ItemGroup>
+
+		<!-- Сообщение об успешном перемещении файла -->
+		<Message Condition="@(RenamedFile-&gt;Count()) &gt; 0" Text="Файл $(TempName).cs переименован и перемещен в @(NewFilePath)." Importance="high" />
+	</Target>
+
+	<!-- Этот Target запускается после перемещения файла -->
+	<Target Name="DeleteGeneratedFileName" AfterTargets="MoveCwTaskFile">
+		<Delete Files="GeneratedFileName.txt" Condition="Exists('GeneratedFileName.txt')" />
+	</Target>
 
 </Project>

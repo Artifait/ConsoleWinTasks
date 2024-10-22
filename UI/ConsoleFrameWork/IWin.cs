@@ -1,5 +1,4 @@
-﻿
-namespace ConsoleWinTasks.UI;
+﻿namespace ConsoleWinTasks.UI.ConsoleFrameWork;
 
 public interface IWin
 {

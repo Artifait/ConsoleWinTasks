@@ -1,56 +1,25 @@
-﻿
-namespace ConsoleWinTasks.UI.Win.ApplicationWin;
+﻿using ConsoleWinTasks.UI.ConsoleFrameWork;
+using ConsoleWinTasks.UI.Win.WinTemplate;
 
-public class WinStart : IWin
+namespace ConsoleWinTasks.UI.Win.ApplicationWin
 {
-    #region DefaultPart
-    public WindowDisplay windowDisplay = new("Tasks", typeof(ProgramOptions));
-
-    public WindowDisplay WindowDisplay
+    public class WinStart : CwTask
     {
-        get => windowDisplay;
-        set => windowDisplay = value;
-    }
+        public override Type? ProgramOptionsType => typeof(ProgramOptions);
 
-    public Type? ProgramOptionsType => typeof(ProgramOptions);
-    public Type? ProgramFieldsType => null;
-
-    public int SizeX => windowDisplay.MaxLeft;
-    public int SizeY => windowDisplay.MaxTop;
-
-    public void Show() => windowDisplay.Show();
-    public void InputHandler()
-    {
-        char lower = char.ToLower(Console.ReadKey().KeyChar);
-
-        WindowTools.UpdateCursorPos(lower, ref windowDisplay, (int)ProgramOptions.CountOptions);
-
-        if (WindowTools.IsKeySelect(lower)) HandlerMetodMenu();
-    }
-    #endregion
-
-    private void HandlerMetodMenu()
-    {
-        Console.Clear();
-        switch ((ProgramOptions)windowDisplay.CursorPosition)
+        public WinStart() : base(nameof(WinStart))
         {
-            case ProgramOptions.Task3:
-                Application.WinStack.Push(WindowsHandler.GetWindow<Task3>());
-                break;
-            //case ProgramOptions.Task4:
-            //    Application.WinStack.Push(WindowsHandler.GetWindow<Task4>());
-            //    break;
-            case ProgramOptions.Exit:
-                Application.IsRunning = false;
-                break;
+            MenuHandlers = new()
+            {
+                { (int)ProgramOptions.Back , BackHandler },
+                { (int)ProgramOptions.WinRegistration , WindowsHandler.AddWindow<WinRegistration> },
+            };
         }
-    }
 
-    public enum ProgramOptions
-    {
-        Task3,  
-        Task4,
-        Exit,
-        CountOptions,
+        public enum ProgramOptions
+        {
+            WinRegistration,
+            Back
+        }
     }
 }

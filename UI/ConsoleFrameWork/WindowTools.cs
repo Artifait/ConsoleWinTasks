@@ -1,16 +1,15 @@
-﻿
-namespace ConsoleWinTasks.UI;
+﻿namespace ConsoleWinTasks.UI.ConsoleFrameWork;
 
 public static class WindowTools
 {
-    private static char[] keysDown = [ 's', 'ы' ];
+    private static char[] keysDown = ['s', 'ы'];
     private static char[] keysUp = ['w', 'ц'];
     private static char[] keysSelect = ['e', 'у'];
 
     public static bool IsKeyFromArray(char[] array, char ch)
     {
         foreach (int num in array)
-            if (num == ch) return true; 
+            if (num == ch) return true;
 
         return false;
     }

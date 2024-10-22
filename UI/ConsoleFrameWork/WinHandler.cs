@@ -1,7 +1,6 @@
-﻿
-using ConsoleWinTasks.UI.Win.WinNotification;
+﻿using ConsoleWinTasks.UI.Win.WinNotification;
 
-namespace ConsoleWinTasks.UI;
+namespace ConsoleWinTasks.UI.ConsoleFrameWork;
 
 public static class WindowsHandler
 {
@@ -10,10 +9,13 @@ public static class WindowsHandler
     public static T GetWindow<T>() where T : IWin, new()
     {
         if (!WinForms.ContainsKey(typeof(T)))
-            WinForms[typeof(T)] = (IWin)new T();
+            WinForms[typeof(T)] = new T();
         return (T)WinForms[typeof(T)];
     }
-
+    public static void AddWindow<T>() where T : IWin, new()
+    {
+        Application.WinStack.Push(GetWindow<T>());
+    }
     public static void AddErroreWindow(string[] messages, bool isFatal = false)
     {
         List<string> stringList1 = [];

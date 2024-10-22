@@ -1,5 +1,5 @@
 ﻿
-using ConsoleWinTasks.UI;
+using ConsoleWinTasks.UI.ConsoleFrameWork;
 using Microsoft.EntityFrameworkCore;
 
 namespace ConsoleWinTasks;
