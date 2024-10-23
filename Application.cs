@@ -1,5 +1,6 @@
 ﻿
 using ConsoleWinTasks.UI.ConsoleFrameWork;
+using ConsoleWinTasks.UI.Win.ApplicationWin;
 using Microsoft.EntityFrameworkCore;
 
 namespace ConsoleWinTasks;
@@ -14,11 +15,10 @@ public static class Application
 
     private static void Init()
     {
-        Console.Title = "Tasks";
-        Console.SetWindowSize(80, 40);
-        WinStack.Push(WindowsHandler.GetWindow<UI.Win.ApplicationWin.WinStart>());
-
-        db = new GameContext();
+        Console.Title = "Book Top Store";
+        Console.SetWindowSize(120, 70);
+        WindowsHandler.AddWindow<WinStart>();
+        db = new BookStoreContext();
         db.Database.EnsureCreated();
         db.Database.Migrate();
     }
