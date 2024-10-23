@@ -72,9 +72,6 @@ namespace ConsoleWinTasks.UI.Win.ApplicationWin
                 goto ShowResult;
 
             resultMessage = "Успешный Вход";
-            WindowsHandler
-
-
         ShowResult:
             WindowsHandler.AddInfoWindow([resultMessage]);
 

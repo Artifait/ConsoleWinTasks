@@ -3,7 +3,11 @@
     var Methods = new string[] { "CreateBook", "EditBook", "DeleteBook", "ToBookStoreInformation" };
     var Fields = new (string FieldName, string Type, bool GenerateHandler)[]
     {
-
+        ("Login", "string", true),
+        ("Password", "string", true),
+        ("BirthDate", "DateOnly", true),
+        ("Age", "int", true),
+        ("Salary", "float", true)
     };
     bool SafeErroreHandlerFromMenuOption = true;
     //</Конфиг>
@@ -27,7 +31,8 @@ namespace ConsoleWinTasks.UI.Win.ApplicationWin
         { 
             Back, 
 <# foreach (var method in Methods) { #>
-            <#= method #>,<# } #> 
+            <#= method #>,
+<# } #> 
 <# foreach (var field in Fields) { #>
             Input<#= field.FieldName #>,
 <# } #>

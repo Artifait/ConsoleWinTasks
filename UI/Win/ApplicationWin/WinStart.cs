@@ -13,12 +13,14 @@ namespace ConsoleWinTasks.UI.Win.ApplicationWin
             {
                 { (int)ProgramOptions.Back , BackHandler },
                 { (int)ProgramOptions.WinRegistration , WindowsHandler.AddWindow<SignUp> },
+                { (int)ProgramOptions.SignIn , WindowsHandler.AddWindow<SignIn> },
             };
         }
 
         public enum ProgramOptions
         {
             WinRegistration,
+            SignIn,
             Back
         }
     }
