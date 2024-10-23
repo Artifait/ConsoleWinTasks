@@ -3,13 +3,8 @@
     var Methods = new string[] { "CreateBook", "EditBook", "DeleteBook", "ToBookStoreInformation" };
     var Fields = new (string FieldName, string Type, bool GenerateHandler)[]
     {
-        ("Login", "string", true),
-        ("Password", "string", true),
-        ("BirthDate", "DateOnly", true),
-        ("Age", "int", true),
-        ("Salary", "float", true)
+        ("Login", "string", false)
     };
-    bool SafeErroreHandlerFromMenuOption = true;
     //</Конфиг>
     int startIdOfFields = Methods.Length + 1;//+1 its Back
 
@@ -33,9 +28,9 @@ namespace ConsoleWinTasks.UI.Win.ApplicationWin
 <# foreach (var method in Methods) { #>
             <#= method #>,
 <# } #> 
-<# foreach (var field in Fields) { #>
+<# foreach (var field in Fields) { if(field.GenerateHandler) {#>
             Input<#= field.FieldName #>,
-<# } #>
+<# } } #>
         }
 <# if (Fields.Length > 0) { #>
         public enum ProgramFields
@@ -69,19 +64,11 @@ namespace ConsoleWinTasks.UI.Win.ApplicationWin
             {
                 { (int)ProgramOptions.Back, BackHandler },<# foreach (var method in Methods) { #> 
                 { (int)ProgramOptions.<#= method #>, <#= method #>Handler }, <# } #> 
-<# foreach (var field in Fields) { #>
+<# foreach (var field in Fields) { if(field.GenerateHandler) { #>
                 { (int)ProgramFields.<#= field.FieldName #> + <#= startIdOfFields #>, Input<#= field.FieldName #>Handler},
-<# } #>
+<# } } #>
             };
         }
-<# if (Fields.Length > 0) {#>
-
-        public override void HandleMenuOption()
-        {
-            try { base.HandleMenuOption(); }
-            catch(Exception ex) { WindowsHandler.AddErroreWindow([ex.Message]); }
-        }
-<# } #>
         #endregion
 
         #region Logic 

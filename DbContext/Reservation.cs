@@ -9,4 +9,6 @@ public class Reservation
 
     public int BookId { get; set; }
     public Book Book { get; set; } = null!;
+
+    public override string ToString() => $"The book {Book} is reserved for {User}.";
 }

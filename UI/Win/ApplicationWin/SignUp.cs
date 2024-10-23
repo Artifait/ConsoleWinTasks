@@ -87,6 +87,10 @@ namespace ConsoleWinTasks.UI.Win.ApplicationWin
                 db.SaveChanges();
                 resultMessage = "Регистрация завершена успешно.";
             }
+            var Fields = new List<(string FieldName, string Type, bool GenerateHandler)>
+            {
+                ("Login", "string", false),
+            };
         ShowResult:
             WindowsHandler.AddInfoWindow([resultMessage]);
         }

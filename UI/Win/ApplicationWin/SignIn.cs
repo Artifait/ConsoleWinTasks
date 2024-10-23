@@ -72,6 +72,8 @@ namespace ConsoleWinTasks.UI.Win.ApplicationWin
                 goto ShowResult;
 
             resultMessage = "Успешный Вход";
+            WindowsHandler.GetWindow<MainWindow>().FdLogin = login;
+            WindowsHandler.AddWindow<MainWindow>();
         ShowResult:
             WindowsHandler.AddInfoWindow([resultMessage]);
 

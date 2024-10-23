@@ -17,6 +17,7 @@ public static class Application
     {
         Console.Title = "Book Top Store";
         Console.SetWindowSize(100, 50);
+        ConsoleWindowMover.MoveToCenter();
         WindowsHandler.AddWindow<WinStart>();
         db = new BookStoreContext();
         db.Database.EnsureCreated();

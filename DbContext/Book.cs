@@ -21,4 +21,6 @@ public class Book
 
     public int? DiscountId { get; set; }
     public Discount? Discount { get; set; }
+
+    public override string ToString() => Title;
 }

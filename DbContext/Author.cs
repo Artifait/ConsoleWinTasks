@@ -9,4 +9,7 @@ public class Author
     public string? MiddleName { get; set; }
 
     public ICollection<Book> Books { get; set; } = new List<Book>();
+
+    public override string ToString()
+        => $"{LastName} {FirstName} {(string.IsNullOrWhiteSpace(MiddleName) ? "" : MiddleName + " ")}";
 }

@@ -8,4 +8,6 @@ public class Discount
     public decimal Multiplier { get; set; }
 
     public ICollection<Book> Books { get; set; } = new List<Book>();
+
+    public override string ToString() => $"Discount name: {Name}\nPrice multiplier: {Multiplier}";
 }   

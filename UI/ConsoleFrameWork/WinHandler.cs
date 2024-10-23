@@ -23,7 +23,7 @@ public static class WindowsHandler
             stringList1.AddRange(message.Split('\n'));
 
         IWin window;
-        if (isFatal)
+        if (!isFatal)
         {
             window = GetWindow<WinErrore>();
             ((WinErrore)window).UpdateErroreMsg(stringList1.ToArray());
