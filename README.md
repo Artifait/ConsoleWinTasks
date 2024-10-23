@@ -1,3 +1,30 @@
+# Exam Info:
+## Первичные данные для тестирования
+```
+INSERT INTO Publishers (Name)
+VALUES
+    ('Penguin Random House'),
+    ('HarperCollins'),
+    ('Simon & Schuster'),
+    ('Macmillan'),
+    ('Hachette Livre');
+
+INSERT INTO Genres (Name)
+VALUES
+    ('Fiction'),
+    ('Non-fiction'),
+    ('Science Fiction'),
+    ('Fantasy'),
+    ('Mystery');
+
+INSERT INTO Authors (FirstName, LastName, MiddleName)
+VALUES
+    ('George', 'Orwell', NULL),
+    ('J.K.', 'Rowling', NULL),
+    ('Isaac', 'Asimov', 'Yudovich'),
+    ('Agatha', 'Christie', NULL),
+    ('Stephen', 'King', 'Edwin');
+```
 
 # FrameWork: ConsoleWin
 ## Documentation of FrameWork

@@ -45,7 +45,9 @@ public static class TV
             maxLengths[i] = table.Columns[i].ColumnName.Length;
             foreach (DataRow row in table.Rows)
             {
-                int length = row[i].ToString().Length;
+                string? str = row[i]?.ToString();
+                str ??= "";
+                int length = str.Length;
                 if (length > maxLengths[i])
                 {
                     maxLengths[i] = length;
@@ -80,7 +82,9 @@ public static class TV
             for (int i = 0; i < table.Columns.Count; i++)
             {
                 Console.Write("| ");
-                Console.Write(row[i].ToString().PadRight(maxLengths[i]));
+                string? str = row[i]?.ToString();
+                str ??= "";
+                Console.Write(str.PadRight(maxLengths[i]));
                 Console.Write(" ");
             }
             Console.WriteLine("|");

@@ -10,13 +10,13 @@ public static class Application
     public static Stack<IWin> WinStack = new();
     public static bool IsRunning = false;
     public static string PathData = Directory.GetCurrentDirectory();
-    public static DbContext db;
+    public static BookStoreContext db;
     public static bool CursorVisible { get; set; } = false;
 
     private static void Init()
     {
         Console.Title = "Book Top Store";
-        Console.SetWindowSize(120, 70);
+        Console.SetWindowSize(100, 50);
         WindowsHandler.AddWindow<WinStart>();
         db = new BookStoreContext();
         db.Database.EnsureCreated();

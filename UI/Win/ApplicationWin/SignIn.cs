@@ -1,15 +1,16 @@
 ﻿using ConsoleWinTasks.UI.Win.WinTemplate;
 using ConsoleWinTasks.UI.ConsoleFrameWork;
+using ConsoleWinTasks.AppLogic;
 
 namespace ConsoleWinTasks.UI.Win.ApplicationWin
 {
-    public class Registration : CwTask
+    public class SignIn : CwTask
     {
         #region GeneratedСode
        public enum ProgramOptions 
         { 
             Back, 
-            Registration, 
+            SignIn, 
             InputLogin,
             InputPassword,
         }
@@ -33,12 +34,12 @@ namespace ConsoleWinTasks.UI.Win.ApplicationWin
             set => WindowDisplay.AddOrUpdateField("Password", value);
         } 
  
-        public Registration() : base(nameof(Registration))
+        public SignIn() : base(nameof(SignIn))
         {
             MenuHandlers = new()
             {
                 { (int)ProgramOptions.Back, BackHandler }, 
-                { (int)ProgramOptions.Registration, RegistrationHandler },  
+                { (int)ProgramOptions.SignIn, SignInHandler },  
                 { (int)ProgramFields.Login + 2, InputLoginHandler},
                 { (int)ProgramFields.Password + 2, InputPasswordHandler},
             };
@@ -57,9 +58,26 @@ namespace ConsoleWinTasks.UI.Win.ApplicationWin
         private void InputPasswordHandler() 
             => FdPassword = IND.InputProperty("Password");
  
-        private void RegistrationHandler()
+        private void SignInHandler()
         {
-            Console.WriteLine("RegistrationHandler");
+            string resultMessage = "Не верный логин или пароль";
+            string login = FdLogin.Trim();
+            string password = FdPassword.Trim();
+            var db = Application.db;
+            User? user = db.Users.Where(g => g.Username == login).FirstOrDefault();
+            if (user == null)
+                goto ShowResult;
+
+            if (!PasswordManager.VerifyHashedPassword(user.HashPassword, password))
+                goto ShowResult;
+
+            resultMessage = "Успешный Вход";
+            WindowsHandler
+
+
+        ShowResult:
+            WindowsHandler.AddInfoWindow([resultMessage]);
+
         }
         #endregion
     }

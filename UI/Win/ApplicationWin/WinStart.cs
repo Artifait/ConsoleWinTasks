@@ -12,7 +12,7 @@ namespace ConsoleWinTasks.UI.Win.ApplicationWin
             MenuHandlers = new()
             {
                 { (int)ProgramOptions.Back , BackHandler },
-                { (int)ProgramOptions.WinRegistration , WindowsHandler.AddWindow<Registration> },
+                { (int)ProgramOptions.WinRegistration , WindowsHandler.AddWindow<SignUp> },
             };
         }
 

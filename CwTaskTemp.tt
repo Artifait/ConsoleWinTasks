@@ -1,16 +1,15 @@
 ﻿<#@ template language="C#" debug="false" hostspecific="true" #><#@ output extension=".cs" #><#@ import namespace="System.IO" #><#@ import namespace="System" #><#
     // <Конфиг>
-    var Methods = new string[] { "Registration" };
+    var Methods = new string[] { "CreateBook", "EditBook", "DeleteBook", "ToBookStoreInformation" };
     var Fields = new (string FieldName, string Type, bool GenerateHandler)[]
     {
-        ("Login", "string", true),
-        ("Password", "string", true),
+
     };
     bool SafeErroreHandlerFromMenuOption = true;
     //</Конфиг>
     int startIdOfFields = Methods.Length + 1;//+1 its Back
 
-    string className = "Registration";
+    string className = "MainWindow";
     string fileName = className + ".cs";
 
     string outputFilePath = Path.Combine(".", "GeneratedFileName.txt");
@@ -49,7 +48,13 @@ namespace ConsoleWinTasks.UI.Win.ApplicationWin
 <# foreach (var field in Fields) { #>
         public string Fd<#= field.FieldName #>
         {
+<# if (field.Type == "DateOnly") { #>
+            get => WindowDisplay.GetOrCreateField("<#= field.FieldName #>", DateOnly.FromDateTime(DateTime.Now).ToString("yyyy-MM-dd"));
+<# } else if (field.Type == "int" || field.Type == "float" || field.Type == "double") { #>
+            get => WindowDisplay.GetOrCreateField("<#= field.FieldName #>", "0");
+<# } else { #>
             get => WindowDisplay.GetOrCreateField("<#= field.FieldName #>");
+<# } #>
             set => WindowDisplay.AddOrUpdateField("<#= field.FieldName #>", value);
         } 
 <# } #> 

@@ -10,7 +10,6 @@ public class BookStoreContext : DbContext
     public DbSet<Discount> Discounts { get; set; }
     public DbSet<Genre> Genres { get; set; }
     public DbSet<Publisher> Publishers { get; set; }
-    public DbSet<Permission> Permissions { get; set; }
     public DbSet<User> Users { get; set; }
     public DbSet<Reservation> Reservations { get; set; }
 
@@ -49,7 +48,7 @@ public class BookStoreContext : DbContext
             .HasMaxLength(100); 
 
         modelBuilder.Entity<User>()
-            .Property(u => u.Password)
+            .Property(u => u.HashPassword)
             .HasMaxLength(100); 
     }
 
