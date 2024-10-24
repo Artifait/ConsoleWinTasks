@@ -1,18 +1,13 @@
 ﻿<#@ template language="C#" debug="false" hostspecific="true" #><#@ output extension=".cs" #><#@ import namespace="System.IO" #><#@ import namespace="System" #><#
     // <Конфиг>
-    var Methods = new string[] { "Enter" };
+    var Methods = new string[] { "LoadProcess", "ShowAllProcess", "ShowOursProcess", "AddYourProcess", "KillYourProcess","Zapac2","Zapac3"  };
     var Fields = new (string FieldName, string Type, bool GenerateHandler)[]
     {
-        ("Login", "string", true),
-        ("Password", "string", true),
-        ("BirthDate", "DateOnly", true),
-        ("Age", "int", true),
-        ("Salary", "float", true)
     };
     //</Конфиг>
     int startIdOfFields = Methods.Length + 1;//+1 its Back
 
-    string className = "WinRegistration";
+    string className = "MainWindow";
     string fileName = className + ".cs";
 
     string outputFilePath = Path.Combine(".", "GeneratedFileName.txt");
@@ -28,46 +23,73 @@ namespace ConsoleWinTasks.UI.Win.ApplicationWin
         #region GeneratedСode
        public enum ProgramOptions 
         { 
-            Back, <# foreach (var method in Methods) { #>
-            <#= method #>,<# } #> <# foreach (var field in Fields) { #>
-            Input<#= field.FieldName #>,<# } #>
-        }<# if (Fields.Length > 0) { #>
+            Back, 
+<# foreach (var method in Methods) { #>
+            <#= method #>,
+<# } #> 
+<# foreach (var field in Fields) { if(field.GenerateHandler) {#>
+            Input<#= field.FieldName #>,
+<# } } #>
+        }
+<# if (Fields.Length > 0) { #>
         public enum ProgramFields
-        {<# foreach (var field in Fields) { #>
-            <#= field.FieldName #>,<# } #>
+        {
+<# foreach (var field in Fields) { #>
+            <#= field.FieldName #>,
+<# } #>
         } 
-        <# if (Fields.Length > 0) #>
+<# } #>
+
+<# if (Fields.Length > 0) #>
         public override Type? ProgramFieldsType => typeof(ProgramFields);
         public override Type? ProgramOptionsType => typeof(ProgramOptions);
-        <# foreach (var field in Fields) { #>
+
+<# foreach (var field in Fields) { #>
         public string Fd<#= field.FieldName #>
         {
+<# if (field.Type == "DateOnly") { #>
+            get => WindowDisplay.GetOrCreateField("<#= field.FieldName #>", DateOnly.FromDateTime(DateTime.Now).ToString("yyyy-MM-dd"));
+<# } else if (field.Type == "int" || field.Type == "float" || field.Type == "double") { #>
+            get => WindowDisplay.GetOrCreateField("<#= field.FieldName #>", "0");
+<# } else { #>
             get => WindowDisplay.GetOrCreateField("<#= field.FieldName #>");
+<# } #>
             set => WindowDisplay.AddOrUpdateField("<#= field.FieldName #>", value);
-        } <# } #> 
-        <# } #>
+        } 
+<# } #> 
         public <#= className #>() : base(nameof(<#= className #>))
         {
             MenuHandlers = new()
             {
                 { (int)ProgramOptions.Back, BackHandler },<# foreach (var method in Methods) { #> 
-                { (int)ProgramOptions.<#= method #>, <#= method #>Handler },<# } #> <# foreach (var field in Fields) { #>
-                { (int)ProgramFields.<#= field.FieldName #> + <#= startIdOfFields #>, Input<#= field.FieldName #>Handler},<# } #>
+                { (int)ProgramOptions.<#= method #>, <#= method #>Handler }, <# } #> 
+<# foreach (var field in Fields) { if(field.GenerateHandler) { #>
+                { (int)ProgramFields.<#= field.FieldName #> + <#= startIdOfFields #>, Input<#= field.FieldName #>Handler},
+<# } } #>
             };
         }
         #endregion
 
-        #region Logic <# foreach (var field in Fields) { if (field.GenerateHandler) { #>
-        private void Input<#= field.FieldName #>Handler()
-        <# if (field.Type == "DateOnly") { #>   => Fd<#= field.FieldName #> = IND.InputDateTime("<#= field.FieldName #>").ToString("yyyy-MM-dd");<# } else if (field.Type == "string") { #>   => Fd<#= field.FieldName #> = IND.InputProperty("<#= field.FieldName #>");<# } else if (field.Type == "int" || field.Type == "float" || field.Type == "double") { #>   => Fd<#= field.FieldName #> = <#= field.Type #>.Parse(IND.InputProperty("<#= field.FieldName #>")).ToString();<# } else { #>{
+        #region Logic 
+<# foreach (var field in Fields) { if (field.GenerateHandler) { #>
+        private void Input<#= field.FieldName #>Handler() 
+<# if (field.Type == "DateOnly") { #>
+            => Fd<#= field.FieldName #> = IND.InputDateTime("<#= field.FieldName #>").ToString("yyyy-MM-dd");
+<# } else if (field.Type == "string") { #>
+            => Fd<#= field.FieldName #> = IND.InputProperty("<#= field.FieldName #>");
+<# } else if (field.Type == "int" || field.Type == "float" || field.Type == "double") { #>
+            => Fd<#= field.FieldName #> = <#= field.Type #>.Parse(IND.InputProperty("<#= field.FieldName #>")).ToString();
+<# } else { #>{
             string <#= field.FieldName.ToLower() #> = string.Empty;
             Fd<#= field.FieldName #> = <#= field.FieldName.ToLower() #>;
-        }<# } #><# } } #> <# foreach (var method in Methods) { #>
+        }
+<# } #><# } } #> 
+<# foreach (var method in Methods) { #>
         private void <#= method #>Handler()
         {
             Console.WriteLine("<#= method #>Handler");
         }
-        <# } #>
+<# } #>
         #endregion
     }
 }
