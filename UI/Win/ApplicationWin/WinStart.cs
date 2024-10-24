@@ -12,13 +12,18 @@ namespace ConsoleWinTasks.UI.Win.ApplicationWin
             MenuHandlers = new()
             {
                 { (int)ProgramOptions.Back , BackHandler },
-                { (int)ProgramOptions.WinRegistration , WindowsHandler.AddWindow<MainWindow> },
+                { (int)ProgramOptions.Task1 , WindowsHandler.AddWindow<Task1> },
+                { (int)ProgramOptions.Task2 , WindowsHandler.AddWindow<Task2> },
+                { (int)ProgramOptions.Task3 , WindowsHandler.AddWindow<Task3> },
+
             };
         }
 
         public enum ProgramOptions
         {
-            WinRegistration,
+            Task1,
+            Task2,
+            Task3,
             Back
         }
     }

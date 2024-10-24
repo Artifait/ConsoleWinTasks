@@ -1,13 +1,14 @@
 ﻿<#@ template language="C#" debug="false" hostspecific="true" #><#@ output extension=".cs" #><#@ import namespace="System.IO" #><#@ import namespace="System" #><#
     // <Конфиг>
-    var Methods = new string[] { "LoadProcess", "ShowAllProcess", "ShowOursProcess", "AddYourProcess", "KillYourProcess","Zapac2","Zapac3"  };
+    var Methods = new string[] { "Play" };
     var Fields = new (string FieldName, string Type, bool GenerateHandler)[]
     {
+        ("Number", "int", false)
     };
     //</Конфиг>
     int startIdOfFields = Methods.Length + 1;//+1 its Back
 
-    string className = "MainWindow";
+    string className = "Task2";
     string fileName = className + ".cs";
 
     string outputFilePath = Path.Combine(".", "GeneratedFileName.txt");
@@ -40,8 +41,8 @@ namespace ConsoleWinTasks.UI.Win.ApplicationWin
         } 
 <# } #>
 
-<# if (Fields.Length > 0) #>
-        public override Type? ProgramFieldsType => typeof(ProgramFields);
+<# if (Fields.Length > 0) {#>
+        public override Type? ProgramFieldsType => typeof(ProgramFields);<# } #>
         public override Type? ProgramOptionsType => typeof(ProgramOptions);
 
 <# foreach (var field in Fields) { #>

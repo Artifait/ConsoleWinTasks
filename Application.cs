@@ -9,7 +9,6 @@ public static class Application
     public static Stack<IWin> WinStack = new();
     public static bool IsRunning = false;
     public static string PathData = Directory.GetCurrentDirectory();
-    public static DbContext db;
     public static bool CursorVisible { get; set; } = false;
 
     private static void Init()
@@ -17,10 +16,6 @@ public static class Application
         Console.Title = "Tasks";
         Console.SetWindowSize(80, 40);
         WinStack.Push(WindowsHandler.GetWindow<UI.Win.ApplicationWin.WinStart>());
-
-        db = new GameContext();
-        db.Database.EnsureCreated();
-        db.Database.Migrate();
     }
 
     public static void Run()

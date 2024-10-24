@@ -1,40 +1,43 @@
-﻿using ConsoleWinTasks.UI.Win.WinTemplate;
+﻿using ConsoleWinTasks.AppLogic;
 using ConsoleWinTasks.UI.ConsoleFrameWork;
+using ConsoleWinTasks.UI.Win.WinTemplate;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Runtime.InteropServices;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace ConsoleWinTasks.UI.Win.ApplicationWin
 {
-    public class MainWindow : CwTask
+    public class Task3 : CwTask
     {
         #region GeneratedСode
-       public enum ProgramOptions 
-        { 
-            Back, 
+        public enum ProgramOptions
+        {
+            Back,
             LoadProcess,
             ShowAllProcess,
             ShowOursProcess,
             AddYourProcess,
             KillYourProcess,
             KillNotepad,
-            Zapac3,
- 
         }
 
         public override Type? ProgramOptionsType => typeof(ProgramOptions);
 
-        public MainWindow() : base(nameof(MainWindow))
+        public Task3() : base(nameof(Task3))
         {
             MenuHandlers = new()
             {
-                { (int)ProgramOptions.Back, BackHandler }, 
-                { (int)ProgramOptions.LoadProcess, LoadProcessHandler },  
-                { (int)ProgramOptions.ShowAllProcess, ShowAllProcessHandler },  
-                { (int)ProgramOptions.ShowOursProcess, ShowOursProcessHandler },  
-                { (int)ProgramOptions.AddYourProcess, AddYourProcessHandler },  
-                { (int)ProgramOptions.KillYourProcess, KillYourProcessHandler },  
-                { (int)ProgramOptions.KillNotepad, KillNotepad },  
-                { (int)ProgramOptions.Zapac3, Zapac3Handler },  
+                { (int)ProgramOptions.Back, BackHandler },
+                { (int)ProgramOptions.LoadProcess, LoadProcessHandler },
+                { (int)ProgramOptions.ShowAllProcess, ShowAllProcessHandler },
+                { (int)ProgramOptions.ShowOursProcess, ShowOursProcessHandler },
+                { (int)ProgramOptions.AddYourProcess, AddYourProcessHandler },
+                { (int)ProgramOptions.KillYourProcess, KillYourProcessHandler },
+                { (int)ProgramOptions.KillNotepad, KillNotepad },
             };
         }
         public override void HandleMenuOption()
@@ -58,8 +61,8 @@ namespace ConsoleWinTasks.UI.Win.ApplicationWin
         }
 
         private void UpdateAllProcess()
-            => allProcesses = [.. Process.GetProcesses()]; 
-        
+            => allProcesses = [.. Process.GetProcesses()];
+
         private void ShowAllProcessHandler()
         {
             UpdateAllProcess();
@@ -158,7 +161,7 @@ namespace ConsoleWinTasks.UI.Win.ApplicationWin
             TV.DisplayTable(userProcesses.Select(g => new { g.Id, g.ProcessName }).ToList());
             int idPr = int.Parse(IND.InputProperty("ID Процесса"));
             Process selectPr = userProcesses.Where(g => g.Id == idPr).FirstOrDefault();
-            if(selectPr != null)
+            if (selectPr != null)
             {
                 userProcesses.Remove(selectPr);
                 selectPr.Kill();
@@ -167,21 +170,13 @@ namespace ConsoleWinTasks.UI.Win.ApplicationWin
             else
                 WindowsHandler.AddInfoWindow([$"Нету такого процесса"]);
         }
-        private void Zapac3Handler()
-        {
-            Console.WriteLine("Zapac3Handler");
-        }
-        [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
-        private static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
 
-        [DllImport("user32.dll", CharSet = CharSet.Auto)]
-        private static extern int SendMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
 
         private const uint WM_CLOSE = 0x0010;
 
         private void KillNotepad()
         {
-            IntPtr hWnd = FindWindow("Notepad", null);
+            IntPtr hWnd = WinApiManager.FindWindow("Notepad", null);
 
             if (hWnd == IntPtr.Zero)
             {
@@ -189,7 +184,7 @@ namespace ConsoleWinTasks.UI.Win.ApplicationWin
             }
             else
             {
-                SendMessage(hWnd, WM_CLOSE, IntPtr.Zero, IntPtr.Zero);
+                WinApiManager.SendMessage(hWnd, WM_CLOSE, IntPtr.Zero, IntPtr.Zero);
                 Console.WriteLine("Close message sent to Notepad.");
             }
         }
