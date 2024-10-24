@@ -11,23 +11,21 @@ public static class TV
     {
         DataTable dataTable = new();
 
-        var firstItem = collection.FirstOrDefault();
-        if (firstItem != null)
-        {
-            foreach (var prop in firstItem.GetType().GetProperties())
-            {
-                dataTable.Columns.Add(prop.Name, prop.PropertyType);
-            }
+        var properties = typeof(T).GetProperties();
 
-            foreach (var item in collection)
+        foreach (var prop in properties)
+        {
+            dataTable.Columns.Add(prop.Name, Nullable.GetUnderlyingType(prop.PropertyType) ?? prop.PropertyType);
+        }
+
+        foreach (var item in collection)
+        {
+            var values = new object[properties.Length];
+            for (int i = 0; i < properties.Length; i++)
             {
-                var row = dataTable.NewRow();
-                foreach (var prop in item.GetType().GetProperties())
-                {
-                    row[prop.Name] = prop.GetValue(item) ?? DBNull.Value;
-                }
-                dataTable.Rows.Add(row);
+                values[i] = properties[i].GetValue(item) ?? DBNull.Value;
             }
+            dataTable.Rows.Add(values);
         }
 
         return dataTable;

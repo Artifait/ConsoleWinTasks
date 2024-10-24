@@ -1,5 +1,6 @@
 ﻿using ConsoleWinTasks.UI.Win.WinTemplate;
 using ConsoleWinTasks.UI.ConsoleFrameWork;
+using Microsoft.EntityFrameworkCore;
 
 namespace ConsoleWinTasks.UI.Win.ApplicationWin
 {
@@ -71,30 +72,33 @@ namespace ConsoleWinTasks.UI.Win.ApplicationWin
             Console.CursorTop = SizeY;
             Console.CursorLeft = 0;
         }
-        private int SelectEntity<T>(string fieldName, List<T> list, Func<T, object> selector)
+        private T SelectEntity<T>(string fieldName, List<T> list, Func<T, object> selector)
         {
             TV.DisplayTable(list.Select(selector).ToList());
             int id = int.Parse(IND.InputProperty($"Id {fieldName}"));
             var entity = list.FirstOrDefault(g => (int)typeof(T).GetProperty("Id")!.GetValue(g, null)! == id)
                 ?? throw new Exception("Не найдена запись");
             WindowDisplay.AddOrUpdateField(fieldName, entity?.ToString() ?? string.Empty);
-            return id;
+            return entity;
         }
         private void CreateBookHandler()
         {
             Book book = new() { };
             ExtraFields = true;
 
-            book.AuthorId = SelectEntity("Автор", Application.db.Authors.ToList(),
+            book.Author = SelectEntity("Автор", Application.db.Authors.ToList(),
                 g => new { g.Id, g.FirstName, g.LastName, g.MiddleName });
+            book.AuthorId = book.Author.Id;
             ToStartWritePos();
 
-            book.GenreId = SelectEntity("Жанр", Application.db.Genres.ToList(),
+            book.Genre = SelectEntity("Жанр", Application.db.Genres.ToList(),
                 g => new { g.Id, g.Name });
+            book.GenreId = book.Genre.Id;
             ToStartWritePos();
 
-            book.PublisherId = SelectEntity("Издательство", Application.db.Publishers.ToList(),
+            book.Publisher = SelectEntity("Издательство", Application.db.Publishers.ToList(),
                 g => new { g.Id, g.Name });
+            book.PublisherId = book.Publisher.Id;
             ToStartWritePos();
 
             book.Title = IND.InputProperty("Название").Trim();
@@ -117,22 +121,33 @@ namespace ConsoleWinTasks.UI.Win.ApplicationWin
             Console.WriteLine("У книги есть прошлая часть(e - да, иначе - нет)");
             if(WindowTools.IsKeySelect(Char.ToLower(Console.ReadKey().KeyChar)))
             {
-                book.PreviousBookId = SelectEntity("Прошлая Часть", Application.db.Books.ToList(),
+                book.PreviousBook = SelectEntity("Прошлая Часть", Application.db.Books.ToList(),
                 g => new { g.Id, g.Title, g.Author });
+                book.PreviousBookId = book.PreviousBook.Id;
+                ToStartWritePos();
             }
-            ToStartWritePos();
-            Console.ReadLine();
-            
+            Console.WriteLine("На книгу сейчас есть скидка(e - да, иначе - нет)");
+            if (WindowTools.IsKeySelect(Char.ToLower(Console.ReadKey().KeyChar)))
+            {
+                book.Discount = SelectEntity("Скидка", Application.db.Discounts.ToList(),
+                g => new { g.Id, g.Name, g.Multiplier });
+                book.DiscountId = book.Discount.Id;
+                ToStartWritePos();
+            }
+
             Application.db.Books.Add(book);
             Application.db.SaveChanges();
-            ToStartWritePos();
-            TV.DisplayTable(Application.db.Books.ToList());
         }
 
 
         private void EditBookHandler()
         {
-            Console.WriteLine("EditBookHandler");
+            Application.db.Books.Include(b => b.Author);
+            Application.db.Books.Include(b => b.Genre);
+            Application.db.Books.Include(b => b.Publisher);
+            Application.db.Books.Include(b => b.PreviousBook);
+
+            TV.DisplayTable(Application.db.Books.Select(g => new { g.Id, g.Title, Author = g.Author.ToString() }).ToList());
         }
         private void DeleteBookHandler()
         {
