@@ -18,11 +18,11 @@ namespace ConsoleWinTasks.UI.Win.WinTemplate
         public int SizeX => windowDisplay.MaxLeft;
         public int SizeY => windowDisplay.MaxTop;
 
-        public void Show() => windowDisplay.Show();
+        public void Show() => windowDisplay.Show(showInput: false);
 
         public void InputHandler()
         {
-            char lower = char.ToLower(Console.ReadKey().KeyChar);
+            char lower = char.ToLower(Console.ReadKey(intercept: true).KeyChar);
             WindowTools.UpdateCursorPos(lower, ref windowDisplay, MenuHandlers.Count);
 
             if (WindowTools.IsKeySelect(lower)) HandleMenuOption();

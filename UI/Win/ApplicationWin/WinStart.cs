@@ -12,8 +12,8 @@ namespace ConsoleWinTasks.UI.Win.ApplicationWin
             MenuHandlers = new()
             {
                 { (int)ProgramOptions.Back , BackHandler },
-                { (int)ProgramOptions.WinRegistration , WindowsHandler.AddWindow<SignUp> },
-                { (int)ProgramOptions.SignIn , WindowsHandler.AddWindow<SignIn> },
+                { (int)ProgramOptions.WinRegistration , WindowsHandler.ToWindow<SignUp> },
+                { (int)ProgramOptions.SignIn , WindowsHandler.ToWindow<SignIn> },
             };
         }
 

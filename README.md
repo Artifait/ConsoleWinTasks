@@ -24,6 +24,14 @@ VALUES
     ('Isaac', 'Asimov', 'Yudovich'),
     ('Agatha', 'Christie', NULL),
     ('Stephen', 'King', 'Edwin');
+
+INSERT INTO Discounts (Name, Multiplier) VALUES
+('Holiday Discount', 0.85),
+('Seasonal Sale', 0.75),
+('Clearance', 0.5),
+('Member Discount', 0.9),
+('New Customer Discount', 0.95);
+
 ```
 
 # FrameWork: ConsoleWin

@@ -12,9 +12,11 @@ public class BookStoreContext : DbContext
     public DbSet<Publisher> Publishers { get; set; }
     public DbSet<User> Users { get; set; }
     public DbSet<Reservation> Reservations { get; set; }
-
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<Book>()
+                .HasCheckConstraint("CK_Book_PreviousBookId_NotSelfReferencing", "[PreviousBookId] IS NULL OR [PreviousBookId] <> [Id]");
+
         modelBuilder.Entity<Book>()
             .Property(b => b.Title)
             .HasMaxLength(255); 

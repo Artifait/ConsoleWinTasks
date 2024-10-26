@@ -40,7 +40,7 @@ namespace ConsoleWinTasks.UI.Win.WinNotification
         public void Show()
         {
             Console.Clear();
-            windowDisplay.Show();
+            windowDisplay.Show(showInput: false);
         }
     }
 
@@ -58,7 +58,6 @@ namespace ConsoleWinTasks.UI.Win.WinNotification
 
         public Type? ProgramFieldsType => null;
 
-        // Метод для обновления сообщения об ошибке
         public void UpdateFatalErrorMsg(string[] ErrorMessages)
         {
             windowDisplay.Fields.Clear();
@@ -71,21 +70,19 @@ namespace ConsoleWinTasks.UI.Win.WinNotification
 
         public int SizeY => windowDisplay.MaxTop;
 
-        // Обработчик ввода, завершает программу после нажатия любой клавиши
         public void InputHandler()
         {
-            Console.ReadKey(); // Ожидаем нажатие клавиши
+            Console.ReadKey();
             Console.Clear();
             Console.WriteLine("Программа завершится после нажатия любой клавиши...");
-            Console.ReadKey(); // Ожидаем подтверждение для завершения
-            Environment.Exit(1); // Завершение программы с кодом ошибки 1
+            Console.ReadKey(); 
+            Environment.Exit(1); 
         }
 
-        // Метод для показа окна
         public void Show()
         {
             Console.Clear();
-            windowDisplay.Show();
+            windowDisplay.Show(showInput: false);
         }
     }
 }

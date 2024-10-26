@@ -180,6 +180,9 @@ public class WindowDisplay
     public void UpdateCanvas()
     {
         CanvasWindow = MatrixFormater.GetWindowMatrixChar(Title, Options.ToArray(), Fields, NumberedOptions);
+        int x = CanvasWindow.GetLength(1) - 1;
+        for (int i = 1; i < CanvasWindow.GetLength(0) - 1; i++)
+            CanvasWindow[i, x] = '|';
         CursorPosition = _CursorPosition;
         NeedUpdateCanvas = false;
     }

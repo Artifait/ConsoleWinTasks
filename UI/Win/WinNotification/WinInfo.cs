@@ -39,7 +39,7 @@ namespace ConsoleWinTasks.UI.Win.WinNotification
         public void Show()
         {
             Console.Clear();
-            windowDisplay.Show();
+            windowDisplay.Show(showInput: false);
         }
     }
 }

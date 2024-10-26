@@ -1,18 +1,18 @@
 ﻿
 using System.Runtime.InteropServices;
 
-namespace ConsoleWinTasks.UI.ConsoleFrameWork;
+namespace ConsoleWinTasks.AppLogic;
 
 public static class ConsoleWindowMover
 {
     [DllImport("kernel32.dll", ExactSpelling = true)]
-    private static extern IntPtr GetConsoleWindow();
+    private static extern nint GetConsoleWindow();
 
     [DllImport("user32.dll", SetLastError = true)]
-    private static extern bool GetWindowRect(IntPtr hWnd, out RECT lpRect);
+    private static extern bool GetWindowRect(nint hWnd, out RECT lpRect);
 
     [DllImport("user32.dll", SetLastError = true)]
-    private static extern bool MoveWindow(IntPtr hWnd, int X, int Y, int nWidth, int nHeight, bool bRepaint);
+    private static extern bool MoveWindow(nint hWnd, int X, int Y, int nWidth, int nHeight, bool bRepaint);
 
     [DllImport("user32.dll", SetLastError = true)]
     private static extern int GetSystemMetrics(int nIndex);
@@ -33,7 +33,7 @@ public static class ConsoleWindowMover
     /// </summary>
     public static void MoveToCenter()
     {
-        IntPtr consoleWindow = GetConsoleWindow();
+        nint consoleWindow = GetConsoleWindow();
         GetWindowRect(consoleWindow, out RECT consoleRect);
 
         // Вычисляем размеры консоли
@@ -51,4 +51,4 @@ public static class ConsoleWindowMover
         // Перемещаем консольное окно
         MoveWindow(consoleWindow, newLeft, newTop, consoleWidth, consoleHeight, true);
     }
-}
+}   

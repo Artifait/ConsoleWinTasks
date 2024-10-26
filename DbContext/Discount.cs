@@ -9,5 +9,5 @@ public class Discount
 
     public ICollection<Book> Books { get; set; } = new List<Book>();
 
-    public override string ToString() => $"Discount name: {Name}\nPrice multiplier: {Multiplier}";
+    public override string ToString() => $"Discount name: {Name}; Price multiplier: {Multiplier}";
 }   

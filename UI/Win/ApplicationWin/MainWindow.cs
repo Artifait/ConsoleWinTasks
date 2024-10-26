@@ -11,10 +11,10 @@ namespace ConsoleWinTasks.UI.Win.ApplicationWin
         { 
             Back, 
             CreateBook,
-            EditBook,
             DeleteBook,
+            ToEditBook,
             ToBookStoreInformation,
- 
+            ToFiches
         }
         public enum ProgramFields
         {
@@ -36,11 +36,12 @@ namespace ConsoleWinTasks.UI.Win.ApplicationWin
         {
             MenuHandlers = new()
             {
-                { (int)ProgramOptions.Back, BackHandler }, 
-                { (int)ProgramOptions.CreateBook, CreateBookHandler },  
-                { (int)ProgramOptions.EditBook, EditBookHandler },  
-                { (int)ProgramOptions.DeleteBook, DeleteBookHandler },  
-                { (int)ProgramOptions.ToBookStoreInformation, ToBookStoreInformationHandler },  
+                { (int)ProgramOptions.Back, BackHandler },
+                { (int)ProgramOptions.CreateBook, CreateBookHandler },
+                { (int)ProgramOptions.DeleteBook, DeleteBookHandler },
+                { (int)ProgramOptions.ToBookStoreInformation, ToBookStoreInformationHandler },
+                { (int)ProgramOptions.ToEditBook, WindowsHandler.ToWindow<EditBook> },
+                { (int)ProgramOptions.ToFiches, WindowsHandler.ToWindow<Fiches> },
             };
         }
 
@@ -68,35 +69,45 @@ namespace ConsoleWinTasks.UI.Win.ApplicationWin
         private void ToStartWritePos()
         {
             Console.Clear();
-            WindowDisplay.Show();
+            WindowDisplay.Show(showInput: false);
             Console.CursorTop = SizeY;
             Console.CursorLeft = 0;
         }
-        private T SelectEntity<T>(string fieldName, List<T> list, Func<T, object> selector)
+        static public T SelectEntity<T>(WindowDisplay windowDisplay, string fieldName, List<T> list, Func<T, object> selector)
         {
             TV.DisplayTable(list.Select(selector).ToList());
             int id = int.Parse(IND.InputProperty($"Id {fieldName}"));
             var entity = list.FirstOrDefault(g => (int)typeof(T).GetProperty("Id")!.GetValue(g, null)! == id)
                 ?? throw new Exception("Не найдена запись");
-            WindowDisplay.AddOrUpdateField(fieldName, entity?.ToString() ?? string.Empty);
+            windowDisplay.AddOrUpdateField(fieldName, entity?.ToString() ?? string.Empty);
             return entity;
         }
+        static public void IncludeBookAllFK()
+        {
+            Application.db.Books.Include(b => b.Publisher);
+            Application.db.Books.Include(b => b.Author);
+            Application.db.Books.Include(b => b.Genre);
+            Application.db.Books.Include(b => b.PreviousBook);
+        }
+        static public void ShowAllBooks()
+            => TV.DisplayTable(Application.db.Books.Select(g => new { g.Id, g.Title, g.Author, g.Genre, g.Publisher, g.PublishedYear }).ToList());
         private void CreateBookHandler()
         {
             Book book = new() { };
             ExtraFields = true;
+            ToStartWritePos();
 
-            book.Author = SelectEntity("Автор", Application.db.Authors.ToList(),
+            book.Author = SelectEntity(windowDisplay, "Автор", Application.db.Authors.ToList(),
                 g => new { g.Id, g.FirstName, g.LastName, g.MiddleName });
             book.AuthorId = book.Author.Id;
             ToStartWritePos();
 
-            book.Genre = SelectEntity("Жанр", Application.db.Genres.ToList(),
+            book.Genre = SelectEntity(windowDisplay, "Жанр", Application.db.Genres.ToList(),
                 g => new { g.Id, g.Name });
             book.GenreId = book.Genre.Id;
             ToStartWritePos();
 
-            book.Publisher = SelectEntity("Издательство", Application.db.Publishers.ToList(),
+            book.Publisher = SelectEntity(windowDisplay, "Издательство", Application.db.Publishers.ToList(),
                 g => new { g.Id, g.Name });
             book.PublisherId = book.Publisher.Id;
             ToStartWritePos();
@@ -117,19 +128,27 @@ namespace ConsoleWinTasks.UI.Win.ApplicationWin
             book.PublishedYear = IND.InputDateTime("Публикации");
             WindowDisplay.AddOrUpdateField("Дата Публикации", book.PublishedYear.ToString("yyyy-MM-dd"));
             ToStartWritePos();
-
+            inputPrevBook:
             Console.WriteLine("У книги есть прошлая часть(e - да, иначе - нет)");
             if(WindowTools.IsKeySelect(Char.ToLower(Console.ReadKey().KeyChar)))
             {
-                book.PreviousBook = SelectEntity("Прошлая Часть", Application.db.Books.ToList(),
-                g => new { g.Id, g.Title, g.Author });
+                book.PreviousBook = SelectEntity(windowDisplay, "Прошлая Часть", Application.db.Books.ToList(),
+                g => new { g.Id, g.Title, g.Author, g.Genre, g.Publisher, g.PublishedYear });
+                if(book.Id == book.PreviousBook.Id)
+                {
+                    Console.WriteLine("Вы ссылаетесь на текущую книгу\nМне придётся отмотать время до совершения этой ошибки");
+                    Console.ReadKey();
+                    ToStartWritePos();
+                    book.PreviousBook = null;
+                    goto inputPrevBook;
+                }
                 book.PreviousBookId = book.PreviousBook.Id;
                 ToStartWritePos();
             }
             Console.WriteLine("На книгу сейчас есть скидка(e - да, иначе - нет)");
             if (WindowTools.IsKeySelect(Char.ToLower(Console.ReadKey().KeyChar)))
             {
-                book.Discount = SelectEntity("Скидка", Application.db.Discounts.ToList(),
+                book.Discount = SelectEntity(windowDisplay, "Скидка", Application.db.Discounts.ToList(),
                 g => new { g.Id, g.Name, g.Multiplier });
                 book.DiscountId = book.Discount.Id;
                 ToStartWritePos();
@@ -139,19 +158,25 @@ namespace ConsoleWinTasks.UI.Win.ApplicationWin
             Application.db.SaveChanges();
         }
 
-
-        private void EditBookHandler()
-        {
-            Application.db.Books.Include(b => b.Author);
-            Application.db.Books.Include(b => b.Genre);
-            Application.db.Books.Include(b => b.Publisher);
-            Application.db.Books.Include(b => b.PreviousBook);
-
-            TV.DisplayTable(Application.db.Books.Select(g => new { g.Id, g.Title, Author = g.Author.ToString() }).ToList());
-        }
         private void DeleteBookHandler()
         {
-            Console.WriteLine("DeleteBookHandler");
+            ToStartWritePos();
+
+            IncludeBookAllFK();
+            ShowAllBooks();
+
+            Console.Write("Будем удалять?(e - да, иначе - нет)");
+            if (WindowTools.IsKeySelect(Char.ToLower(Console.ReadKey().KeyChar)))
+            {
+                Console.WriteLine();
+                var book = Application.db.Books.Where(g => g.Id == int.Parse(IND.InputProperty("Id удаляемой книги"))).First();
+                Application.db.Books.Remove(book);
+                Application.db.SaveChanges();
+                ToStartWritePos();
+                ShowAllBooks();
+            }
+            else
+                ToStartWritePos();
         }
         private void ToBookStoreInformationHandler()
         {

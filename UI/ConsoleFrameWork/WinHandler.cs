@@ -13,8 +13,13 @@ public static class WindowsHandler
         return (T)WinForms[typeof(T)];
     }
     public static void AddWindow<T>() where T : IWin, new()
-    {
+    {       
         Application.WinStack.Push(GetWindow<T>());
+    }
+    public static void ToWindow<T>() where T : IWin, new()
+    {
+        AddWindow<T>();
+        Console.Clear();
     }
     public static void AddErroreWindow(string[] messages, bool isFatal = false)
     {
@@ -48,12 +53,5 @@ public static class WindowsHandler
 
         window.UpdateInfoMsg(stringList1.ToArray());
         Application.WinStack.Push(window);
-    }
-
-    public static string PadCenter(this string str, int totalWidth)
-    {
-        int count1 = (totalWidth - str.Length) / 2;
-        int count2 = totalWidth - str.Length - count1;
-        return new string(' ', count1) + str + new string(' ', count2);
     }
 }

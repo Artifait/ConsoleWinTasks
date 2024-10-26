@@ -13,6 +13,10 @@ public static class TV
 
         var properties = typeof(T).GetProperties();
 
+        if(properties.Length == 0 )
+            properties = collection.FirstOrDefault()?.GetType().GetProperties();
+
+
         foreach (var prop in properties)
         {
             dataTable.Columns.Add(prop.Name, Nullable.GetUnderlyingType(prop.PropertyType) ?? prop.PropertyType);

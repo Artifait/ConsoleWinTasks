@@ -193,4 +193,10 @@ public static class MatrixFormater
     public static int GetMaxLength(string[] strings) => strings != null && strings.Length != 0 ? strings.Max(s => s.Length) : 0;
     public static int GetMaxLength(Dictionary<string, string> strings) => strings.Max(s => s.Key.Length + s.Value.Length) + 2;
 
+    public static string PadCenter(this string text, int width)
+    {
+        if (text.Length >= width) return text;
+        int padding = (width - text.Length) / 2;
+        return new string(' ', padding) + text + new string(' ', width - text.Length - padding);
+    }
 }
