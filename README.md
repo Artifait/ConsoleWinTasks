@@ -73,8 +73,8 @@ s e
 * Вход + переход к Deletor Book
 ```
 s e 
-s s e Artur
-s e 1234
+s s e UserName
+s e Password
 w w e 
 s s e e
 ```
