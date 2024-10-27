@@ -22,5 +22,7 @@ public class Book
     public int? DiscountId { get; set; }
     public Discount? Discount { get; set; }
 
+    public ICollection<Sale> Sales { get; set; } = new List<Sale>();
+
     public override string ToString() => Title;
 }

@@ -43,8 +43,7 @@ VALUES
 ```
 e 
 s s e UserName
-s
-e Password
+s e Password
 s s e
 ```
 * Для входа
@@ -54,7 +53,15 @@ s s e UserName
 s e Password
 w w e
 ```
-* Вход + переход к редактору книг
+* Вход + переход к Creator Book
+```
+s e 
+s s e UserName
+s e Password
+w w e
+s e
+```
+* Вход + переход к Editor Book
 ```
 s e 
 s s e UserName
