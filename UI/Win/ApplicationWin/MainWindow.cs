@@ -1,6 +1,7 @@
 ﻿using ConsoleWinTasks.UI.Win.WinTemplate;
 using ConsoleWinTasks.UI.ConsoleFrameWork;
 using Microsoft.EntityFrameworkCore;
+using static System.Reflection.Metadata.BlobBuilder;
 
 namespace ConsoleWinTasks.UI.Win.ApplicationWin
 {
@@ -19,7 +20,7 @@ namespace ConsoleWinTasks.UI.Win.ApplicationWin
         public enum ProgramFields
         {
             Login,
-        } 
+        }  
 
         public override Type? ProgramFieldsType => typeof(ProgramFields);
         public override Type? ProgramOptionsType => typeof(ProgramOptions);
@@ -161,6 +162,12 @@ namespace ConsoleWinTasks.UI.Win.ApplicationWin
         private void DeleteBookHandler()
         {
             ToStartWritePos();
+
+            if (!Application.db.Books.Any())
+            {
+                WindowsHandler.AddInfoWindow(["Нету книг"]);
+                return;
+            }
 
             IncludeBookAllFK();
             ShowAllBooks();

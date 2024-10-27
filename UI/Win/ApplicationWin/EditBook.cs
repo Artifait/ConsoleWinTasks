@@ -267,7 +267,11 @@ namespace ConsoleWinTasks.UI.Win.ApplicationWin
                 .Include(b => b.Publisher)
                 .Include(b => b.PreviousBook)
                 .Include(b => b.Discount);
-
+            if(!books.Any())
+            {
+                WindowsHandler.AddInfoWindow(["Нету книг для редактирования"]);
+                return;
+            }
             TV.DisplayTable(books.Select(g => new { g.Id, g.Title, g.Author, g.Genre, g.Publisher, g.PublishedYear }).ToList());
             int id = int.Parse(IND.InputProperty("Id Книги для Редактирования"));
             editBook = books.FirstOrDefault(b => b.Id == id);

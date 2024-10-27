@@ -40,20 +40,4 @@ public static class Application
         }
     }
 }
-/*Типо авто Теста(имитируем ввод пользователя): ctrl + c, и по консоли лкм
-s
-e
-s
-s
-e Artur
-s
-e 1234
-w
-w
-e
-w
-w
-e
-s
-e
-*/
+

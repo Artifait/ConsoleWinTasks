@@ -25,15 +25,52 @@ VALUES
     ('Agatha', 'Christie', NULL),
     ('Stephen', 'King', 'Edwin');
 
-INSERT INTO Discounts (Name, Multiplier) VALUES
-('Holiday Discount', 0.85),
-('Seasonal Sale', 0.75),
-('Clearance', 0.5),
-('Member Discount', 0.9),
-('New Customer Discount', 0.95);
-
+INSERT INTO Discounts (Name, Multiplier) 
+VALUES
+    ('Holiday Discount', 0.85),
+    ('Seasonal Sale', 0.75),
+    ('Clearance', 0.5),
+    ('Member Discount', 0.9),
+    ('New Customer Discount', 0.95);
 ```
 
+## Автоматизация
+Для того, чтобы не тратить ваше драгоценное время, были выдуманы "Автоматики".
+### Автоматик
+Это последовательность комманд, которая иммитирует ввод пользователя.
+### Примеры Автоматиков
+* Для регистрации нового пользователя
+```
+e 
+s s e UserName
+s
+e Password
+s s e
+```
+* Для входа
+```
+s e 
+s s e UserName
+s e Password
+w w e
+```
+* Вход + переход к редактору книг
+```
+s e 
+s s e UserName
+s e Password
+w w e 
+w w w e 
+s e
+```
+* Вход + переход к Deletor Book
+```
+s e 
+s s e Artur
+s e 1234
+w w e 
+s s e e
+```
 # FrameWork: ConsoleWin
 ## Documentation of FrameWork
 
