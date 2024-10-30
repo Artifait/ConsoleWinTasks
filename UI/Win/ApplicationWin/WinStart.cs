@@ -15,7 +15,7 @@ namespace ConsoleWinTasks.UI.Win.ApplicationWin
                 { (int)ProgramOptions.Task1 , WindowsHandler.AddWindow<Task1> },
                 { (int)ProgramOptions.Task2 , WindowsHandler.AddWindow<Task2> },
                 { (int)ProgramOptions.Task3 , WindowsHandler.AddWindow<Task3> },
-
+                { (int)ProgramOptions.ToFiches , WindowsHandler.AddWindow<Fiches> },
             };
         }
 
@@ -24,6 +24,7 @@ namespace ConsoleWinTasks.UI.Win.ApplicationWin
             Task1,
             Task2,
             Task3,
+            ToFiches,
             Back
         }
     }
