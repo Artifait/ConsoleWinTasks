@@ -10,66 +10,47 @@ namespace ConsoleWinTasks.UI.Win.ApplicationWin
        public enum ProgramOptions 
         { 
             Back, 
-            Play,
-         }
+            Start,
+        }
+        public enum ProgramFields
+        { 
+            Max,
+            Min,
+        }
+        private Action<int> AddNewNumber;
         public override Type? ProgramOptionsType => typeof(ProgramOptions);
- 
+        public List<int> numbers;
+        public Random rand = new();
+        public Timer timer = new(GenNumber);
+        public void GenNumber()
+        {
+            int number = rand.Next(1, 10001);
+            numbers.Add(number);
+            AddNewNumber?.Invoke(number);
+
+        }
         public Task2() : base(nameof(Task2))
         {
             MenuHandlers = new()
             {
                 { (int)ProgramOptions.Back, BackHandler }, 
-                { (int)ProgramOptions.Play, PlayHandler },  
+                { (int)ProgramOptions.Start, StartHandler },  
             };
         }
         #endregion
 
         #region Logic 
 
-        private const uint MB_YESNO = (uint)WinApiManager.TypeWindow.MB_YESNO;
-        private const uint MB_YESNOCANCEL = (uint)WinApiManager.TypeWindow.MB_YESNOCANCEL;
-        private const uint IDYES = (uint)WinApiManager.TypeAnswer.YES;
-        private const uint IDNO = (uint)WinApiManager.TypeAnswer.NO;
-        private const uint IDCANCEL = (uint)WinApiManager.TypeAnswer.CANCEL;
-        private void PlayHandler()
+        private void StartHandler()
         {
-            int min = 0;
-            int max = 100;
-            bool guessed = false;
+        }
+        private void OnAddNumberMin()
+        {
 
-            WinApiManager.MessageBox(IntPtr.Zero, "Загадайте число от 0 до 100.", "Игра", 0);
+        }
+        private void OnAddNumberMax()
+        {
 
-            while (!guessed)
-            {
-                int guess = (min + max) / 2;
-
-                string message = $"Ваше число {guess}?";
-                int result = WinApiManager.MessageBox(IntPtr.Zero, message, "Угадываем", MB_YESNOCANCEL);
-
-                if (result == IDYES)
-                {
-                    WinApiManager.MessageBox(IntPtr.Zero, $"Число угадано! Это {guess}.", "Поздравление", 0);
-                    guessed = true;
-                }
-                else if (result == IDNO)
-                {
-                    result = WinApiManager.MessageBox(IntPtr.Zero, "Ваше число больше?", "Уточнение", MB_YESNO);
-
-                    if (result == IDYES)
-                    {
-                        min = guess + 1;
-                    }
-                    else
-                    {
-                        max = guess - 1;
-                    }
-                }
-                else if (result == IDCANCEL)
-                {
-                    WinApiManager.MessageBox(IntPtr.Zero, "Игра отменена.", "Отмена", 0);
-                    guessed = true;
-                }
-            }
         }
         #endregion
     }
