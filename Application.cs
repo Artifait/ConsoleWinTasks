@@ -1,4 +1,5 @@
 ﻿
+using ConsoleWinTasks.AppLogic;
 using ConsoleWinTasks.UI.ConsoleFrameWork;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,9 +14,10 @@ public static class Application
 
     private static void Init()
     {
-        Console.Title = "Tasks";
+        Console.Title = "Tasks"; 
         Console.SetWindowSize(80, 40);
         WinStack.Push(WindowsHandler.GetWindow<UI.Win.ApplicationWin.WinStart>());
+        ConsoleWindowMover.MoveToCenter();
     }
 
     public static void Run()

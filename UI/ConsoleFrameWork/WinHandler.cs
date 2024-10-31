@@ -16,6 +16,11 @@ public static class WindowsHandler
     {
         Application.WinStack.Push(GetWindow<T>());
     }
+    public static void ToWindow<T>() where T : IWin, new()
+    {
+        AddWindow<T>();
+        Console.Clear();
+    }
     public static void AddErroreWindow(string[] messages, bool isFatal = false)
     {
         List<string> stringList1 = [];
