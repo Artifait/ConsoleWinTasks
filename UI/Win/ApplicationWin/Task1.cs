@@ -24,14 +24,14 @@ namespace ConsoleWinTasks.UI.Win.ApplicationWin
             MenuHandlers = new()
             {
                 { (int)ProgramOptions.Back, BackHandler },
-                { (int)ProgramOptions.StartProcces, Task1Handler },
+                { (int)ProgramOptions.StartProcces, WaitEndAndViewCode },
             };
         }
         #endregion
 
         #region Logic
 
-        private void Task1Handler()
+        public static void WaitEndAndViewCode()
         {
             string filePath = IND.InputProperty("путь к exe(Пример: notepad.exe)");
             using (Process process = new())

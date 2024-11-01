@@ -1,50 +1,45 @@
-﻿
+﻿using ConsoleWinTasks.UI.Win.WinTemplate;
 using ConsoleWinTasks.UI.ConsoleFrameWork;
-using ConsoleWinTasks.UI.Win.WinTemplate;
 using System.Diagnostics;
 
 namespace ConsoleWinTasks.UI.Win.ApplicationWin
 {
-    public class Task3 : CwTask
+    public class Task4 : CwTask
     {
         #region GeneratedСode
-        public enum ProgramOptions
-        {
-            Back,
-            Start
+       public enum ProgramOptions 
+        { 
+            Back, 
+            Start,
+ 
         }
 
         public override Type? ProgramOptionsType => typeof(ProgramOptions);
 
-        public Task3() : base(nameof(Task3))
+ 
+        public Task4() : base(nameof(Task4))
         {
             MenuHandlers = new()
             {
-                { (int)ProgramOptions.Back, BackHandler },
-                { (int)ProgramOptions.Start, StartHandler },
-
+                { (int)ProgramOptions.Back, BackHandler }, 
+                { (int)ProgramOptions.Start, StartHandler },  
             };
-        }
-        public override void HandleMenuOption()
-        {
-            Console.Clear();
-            base.HandleMenuOption();
         }
         #endregion
 
         #region Logic 
+ 
         private void StartHandler()
         {
-            string num1 = IND.InputProperty("Введите первое число");
-            string num2 = IND.InputProperty("Введите второе число");
-            string operation = IND.InputProperty("Введите операцию (+, -, *, /)");
+            string filePath = IND.InputProperty("Введите путь к файлу (Пример: E:\\someFolder\\file.txt)");
+            string searchWord = IND.InputProperty("Введите слово для поиска");
 
-            string childProcessPath = @"..\..\..\AppLogic\MathProcess\ChildProcessApp.exe"; 
+            string childProcessPath = @"..\..\..\AppLogic\FileSearchProcess\ChildProcessApp.exe";
 
-            using (Process process = new Process())
+            using (Process process = new())
             {
                 process.StartInfo.FileName = childProcessPath;
-                process.StartInfo.Arguments = $"{num1} {num2} {operation}";
+                process.StartInfo.Arguments = $"\"{filePath}\" \"{searchWord}\"";
                 process.StartInfo.UseShellExecute = false;
                 process.StartInfo.RedirectStandardOutput = true;
                 process.StartInfo.CreateNoWindow = true;
